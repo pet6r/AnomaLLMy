@@ -4,8 +4,8 @@ __pycache__/
 *$py.class
 
 # Sensitive Data
-data/processed/*
-data/raw/*
+#data/processed/*
+#data/raw/connections.*
 
 
 # C extensions
