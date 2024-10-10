@@ -1,0 +1,31 @@
+
+Efficiency and Content Metrics:
+===============================
+1. Performance Metrics:
+   - Total Response Time: 21.17 seconds
+   - Average Chunk Time: 0.1224 seconds
+   - Response Rate: 2.08 words/second
+
+2. Content Metrics:
+   - Word Count: 44
+   - Character Count: 320
+   - Sentence Count: 4
+   - Average Word Length: 7.27 characters
+   - Average Sentence Length: 11.00 words
+   - Vocabulary Richness: 0.3182
+
+3. Content Analysis:
+   - Top 5 Most Common Words: srcip (4), dstip (4), srcport (4), dstport (4), srcmac (4)
+
+4. Model Consistency:
+   - Estimated Accuracy: N/A (requires human evaluation or benchmark comparison)
+   - Response Coherence: N/A (requires human evaluation)
+
+Note: These metrics can be compared over time to track changes in model performance and output characteristics.
+===============================
+
+
+ 1. SRCIP, DSTIP, SRCPORT, DSTPORT, SRCMAC, DSTMAC, SRCMFG, DSTMFG, CNT, NOTES:
+ 2. SRCIP, DSTIP, SRCPORT, DSTPORT, SRCMAC, DSTMAC, SRCMFG, DSTMFG, CNT, NOTES:
+ 3. SRCIP, DSTIP, SRCPORT, DSTPORT, SRCMAC, DSTMAC, SRCMFG, DSTMFG, CNT, NOTES:
+ 4. SRCip, Dstip, SRCport, Dstport, Srcmac, Dstmac, SRCmfg, Dstmfg, Cnt, NOTES:
