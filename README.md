@@ -7,8 +7,9 @@ Follow these steps to set up your environment for AnomaLLMy:
 
 #### Prerequisites
 
-- Python 3.8 or higher
+- Python 3.11 or higher
 - Git
+- Jupyter Lab
 ##
 
 ### 1. Create a directory for the project:
