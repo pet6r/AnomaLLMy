@@ -1,0 +1,112 @@
+
+Consolidated Metrics:
+===============================
+1. Performance Metrics:
+   - Total Elapsed Time: 212.82 seconds
+   - Average Response Rate: 4.02 words/second
+
+2. Content Metrics:
+   - Total Word Count: 837
+   - Total Character Count: 5675
+   - Total Sentence Count: 100
+   - Average Word Length: 6.78 characters
+   - Average Sentence Length: 8.37 words
+   - Average Vocabulary Richness: 0.4988
+
+3. Content Analysis:
+   - Top 5 Most Common Words: is (33), connection (26), port (13), device (12), ff (12)
+
+===============================
+
+
+Conversation 1:
+1. Device Identification:
+   - For Connection 1:
+     - SRCIP: 172.16.50.1 (TechCorp device)
+     - DSTIP: 198.51.100.2 (NetSys device)
+     - SRCPORT: EPH (Ephemeral port used by ICS devices)
+     - DSTPORT: 443 (Standard port for HTTPS/SSL communication)
+   - For Connection 2:
+     - SRCIP: 198.51.100.2 (NetSys device)
+     - DSTIP: 172.16.50.1 (TechCorp device)
+     - SRCPORT: EPH (Ephemeral port used by ICS devices)
+     - DSTPORT: 443 (Standard port for HTTPS/SSL communication)
+
+2. Communication Details:
+   - For Connection 1:
+     - MFG: TechCorp (SRCIP) and NetSys (DSTIP)
+     - PORT: EPH (outgoing), 443 (incoming)
+   - For Connection 2:
+     - MFG: NetSys (DSTIP) and TechCorp (SRCIP)
+     - PORT: EPH (outgoing), 443 (incoming)
+
+3. Traffic Volume:
+   - For Connection 1: 2785.0 packets
+   - For Connection 2: 2333.0 packets
+
+4. Implications and Concerns:
+   - Both connections involve devices from different manufacturers (TechCorp and NetSys) communicating over port 443, which is typically used for HTTPS/SSL communication.
+   - The use of ephemeral ports (EPH) is common in ICS environments, but it's essential to investigate further to ensure there are no security implications.
+   - Further research is needed to determine if these connections are legitimate or if they should be flagged as potential security anomalies.
+
+Conversation 2:
+1. Device Identification:
+   - Connection 4:
+     - SRCIP: 172.16.60.1 (TechCorp device)
+     - DSTIP: 198.51.100.2 (NetSys device)
+     - SRCMAC: 00:1A:2B:3C:4D:5F
+     - DSTMAC: 10:AB:CD:EF:12:34
+   - Connection 5:
+     - SRCIP: 198.51.100.2 (NetSys device)
+     - DSTIP: 172.16.60.1 (TechCorp device)
+     - SRCMAC: 10:AB:CD:EF:12:34
+     - DSTMAC: 00:1A:2B:3C:4D:5F
+
+2. Communication Details:
+   - Connection 4:
+     - MFGs: TechCorp (SRCIP), NetSys (DSTIP)
+     - Ports: SRCIP EPH (172.16.60.1 SRCPORT 443), DSTIP EPH (198.51.100.2 DRSCP 443)
+   - Connection 5:
+     - MFGs: NetSys (SRCIP), TechCorp (DSTIP)
+     - Ports: SRCIP TCP (198.51.100.2 SRCPORT 443), DSTIP TCP (172.16.60.1 DRSCP 443)
+
+3. Traffic Volume:
+   - Connection 4: 1192.0 packets
+   - Connection 5: 1193.0 packets
+
+4. Implications and Concerns:
+   - Both connections involve communication between a TechCorp device (SRCIP) and a NetSys device (DSTIP).
+   - The use of EPH (ephemeral port) for outgoing traffic from TechCorp devices is common in ICS environments, as these ports are often used for control applications.
+   - The use of TCP for incoming traffic (SRCPORT 443 and DRSCP 443) suggests that data exchange is occurring over a secure connection.
+   - The relatively high number of packets exchanged between the devices (1192.0 and 1193.0, respectively) may indicate frequent communication or potential issues with network performance.
+   - Further research is needed to determine the purpose of this communication and if it falls within normal operational parameters.
+
+Conversation 3:
+1. Device Identification:
+   - Connection 7: The SRCIP is from TechCorp with MAC address 00:1A:2B:3C:4D:5E and the DSTIP is from NetSys with MAC address 10:AB:CD:EF:12:34.
+
+2. Communication Details:
+   - Connection 7: The MFG names of the communicating devices are TechCorp (SRCIP) and NetSys (DSTIP). The outgoing port is EPH (Ephemeral Port) and incoming port is 443.
+
+3. Traffic Volume:
+   - Connection 7: The total sum of packets exchanged between the devices is 2.0.
+
+4. Implications and Concerns:
+   - This connection shows an attempted remote access from TechCorp to NetSys. The outgoing port is an ephemeral port, which is commonly used by ICS devices for temporary connections. The incoming port is 443, which is typically used for secure communication (HTTPS). The traffic volume is relatively low, but the attempt itself is a cause for concern as it may indicate an unauthorized attempt to access the system. Further research is needed to determine the legitimacy of this connection and to investigate any potential security breaches.
+
+Conversation 4:
+1. Device Identification:
+   - Connection 10: The SRCIP is NaN, which typically means it's missing or not applicable. The DSTIP is FF:FF:FF:FF:FF:FF, which is a broadcast address. The SRCMFG is IndustrialTech and the DSTMFG is BROADCAST. The SRCPORT and DSTPORT are both NaN, indicating they're not applicable. The SRCMAC and DSTMAC are 5C:AA:BB:CC:DD:EE and FF:FF:FF:FF:FF:FF respectively.
+   - Connection 11: The SRCIP is 172.16.1.1, which is a private IP address. The DSTIP is 224.0.0.1, which is also a private IP address. The SRCPORT is IGMP and the DSTPORT is NaN. The SRCMFG and DSTMFG are both IndustrialTech. The SRCMAC and DSTMAC are not provided.
+
+2. Communication Details:
+   - Connection 10: The communicating devices are IndustrialTech (SRC) and BROADCAST (DST). The outgoing traffic is on ARP protocol with SRCPORT as NaN, and incoming traffic is IGMP with DSTPORT as NaN.
+   - Connection 11: The communicating devices are IndustrialTech (SRC) and IGMP Discovery (DST). The outgoing traffic is IGMP with SRCPORT as IGMP and incoming traffic is none.
+
+3. Traffic Volume:
+   - Connection 10: The total sum of packets exchanged is 863986.0.
+   - Connection 11: The total sum of packets exchanged is 3334.0.
+
+4. Implications and Concerns:
+   - Connection 10: The ARP traffic from an IndustrialTech device to a broadcast address is unusual and may indicate a misconfiguration or potential security risk. Further research is needed to confirm this.
+   - Connection 11: The IGMP traffic from an IndustrialTech device to an IGMP Discovery device is expected in an ICS environment as it's used for network discovery. However, the high volume of packets (3334.0) is unusual and may indicate a problem that needs further investigation.
