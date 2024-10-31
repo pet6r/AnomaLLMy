@@ -29,8 +29,8 @@ Based on the provided connection data, I will analyze each conversation and prov
 **Conversation 1**
 
 * Device Identification:
-	+ SRCIP (172.16.50.1): TechCorp device with MAC address 00:1A:2B:3C:4D:5E
-	+ DSTIP (198.51.100.2): NetSys device with MAC address 10:AB:CD:EF:12:34
+	+ SRCP (172.16.50.1): TechCorp device with MAC address 00:1A:2B:3C:4D:5E
+	+ DSTIP (198.51.100.2): NetSys device with MAIC address 10:AB:CD:EF:12:34
 * Communication Details:
 	+ Protocol: TCP
 	+ Ports used for outgoing and incoming traffic: EPH (ephemeral port) on ports 443 (SSL/TLS)
