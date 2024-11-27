@@ -6,9 +6,13 @@ from datetime import datetime
 import re
 from collections import Counter
 from tqdm import tqdm
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class StreamingCybersecurityAnalyzer:
-    def __init__(self, model_name='granite3-dense:2b', excel_path=None):
+    def __init__(self, model_name='gemma2:2b', excel_path=None):
         current_dir = os.path.dirname(os.path.abspath(__file__))
 
         self.model_name = model_name
@@ -16,34 +20,8 @@ class StreamingCybersecurityAnalyzer:
         self.responses_folder = os.path.join(current_dir, '../../data/streamed_responses/')
         self.stop_words = set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by'])
 
-        # Lists to store responses and metrics for all conversations
-        self.responses = []
-        self.metrics_list = []
-
-    def excel_to_csv(self):
-        df = pd.read_excel(self.excel_path)
-        csv_path = os.path.join(os.path.dirname(self.excel_path), 'mock_connections.csv')
-        df.to_csv(csv_path, index=False)
-        return csv_path
-
-    def prepare_data(self, csv_path):
-        df = pd.read_csv(csv_path)
-        subset_df = df[['SRCIP', 'DSTIP', 'PROTOCOL', 'SRCPORT', 'DSTPORT', 'SRCMAC', 'DSTMAC', 'SRCMFG', 'DSTMFG', 'CNT', 'NOTES']]
-        groups = []
-        current_group = []
-        for _, row in subset_df.iterrows():
-            if row.isnull().all():
-                if current_group:
-                    groups.append(pd.DataFrame(current_group))
-                    current_group = []
-            else:
-                current_group.append(row)
-        if current_group:
-            groups.append(pd.DataFrame(current_group))
-        return groups
-
-    def generate_prompt(self, group):
-        prompt = """
+        # Pre-define static parts of the prompt to avoid recreating
+        self.base_prompt = """
         You are a highly skilled virtual cybersecurity analyst specializing in identifying
         and reporting anomalous connections within an ICS (Industrial Control System) environment.
         Your task is to analyze the following connection data and provide detailed insights
@@ -63,50 +41,104 @@ class StreamingCybersecurityAnalyzer:
         2. Communication Details: Specify the MFG names of the communicating devices, their IP addresses, and the ports used for outgoing and incoming traffic.
         Provide information about the ports used if possible.
         3. Traffic Volume: Calculate the total sum of (CNT) packets exchanged between the devices.
-        4. Implications and Concerns: Analyze what is happening within each conversation. Explain if it needs further research. Note: If these connections are in the csv file it    means that they weren't
+        4. Implications and Concerns: Analyze what is happening within each conversation. Explain if it needs further research. Note: If these connections are in the csv file it means that they weren't
         a part of the baseline/allowlist. They were picked up as an anomaly.
         """
-        prompt += f"\nConversation:\n{group.to_string()}\n"
-        return prompt
+
+        # Lists to store responses and metrics for all conversations
+        self.responses = []
+        self.metrics_list = []
+
+    def excel_to_csv(self):
+        try:
+            df = pd.read_excel(self.excel_path)
+            csv_path = os.path.join(os.path.dirname(self.excel_path), 'mock_connections.csv')
+            df.to_csv(csv_path, index=False)
+            logging.info(f"Excel data converted to CSV at {csv_path}")
+            return csv_path
+        except Exception as e:
+            logging.error(f"Error converting Excel to CSV: {e}")
+            return None
+
+    def prepare_data(self, csv_path):
+        if not csv_path:
+            logging.error("CSV path is None; cannot prepare data.")
+            return []
+    
+        try:
+            df = pd.read_csv(csv_path)
+            logging.info(f"Loaded CSV data with shape: {df.shape}")
+    
+            # Define a subset of the data for grouping
+            subset_df = df[['SRCIP', 'DSTIP', 'PROTOCOL', 'SRCPORT', 'DSTPORT', 'SRCMAC', 'DSTMAC', 'SRCMFG', 'DSTMFG', 'CNT', 'NOTES']]
+    
+            # Identify rows that act as group separators
+            groups = []
+            current_group = []
+    
+            for _, row in subset_df.iterrows():
+                # Check if the row has critical columns as NaN (signifying a separator)
+                if pd.isna(row['SRCIP']) and pd.isna(row['DSTIP']):
+                    if current_group:  # If there is data collected, save it as a group
+                        groups.append(pd.DataFrame(current_group))
+                        current_group = []  # Reset for the next group
+                else:
+                    current_group.append(row)  # Collect data into the current group
+    
+            if current_group:
+                groups.append(pd.DataFrame(current_group))  # Append any remaining group
+    
+            logging.info(f"Prepared {len(groups)} connection groups.")
+            return groups
+        except Exception as e:
+            logging.error(f"Error preparing data: {e}")
+            return []
+
+
+    def generate_prompt(self, group):
+        # Insert the group data into the base prompt
+        return self.base_prompt + f"\nConversation:\n{group.to_string(index=False)}\n"
 
     def get_llama_response(self, prompt):
-        start_time = time.time()
-        stream = ollama.chat(
-            model=self.model_name,
-            messages=[{'role': 'user', 'content': prompt}],
-            stream=True
-        )
+        try:
+            start_time = time.time()
+            stream = ollama.chat(
+                model=self.model_name,
+                messages=[{'role': 'user', 'content': prompt}],
+                stream=True
+            )
 
-        progress_bar = tqdm(desc="Receiving response", unit="chunk")
-        full_response = ""
-        chunk_times = []
-        chunk_start = time.time()
-
-        for chunk in stream:
-            content = chunk['message']['content']
-            full_response += content
-            progress_bar.update(len(content))
-            chunk_times.append(time.time() - chunk_start)
+            progress_bar = tqdm(desc="Receiving response", unit="chunk")
+            full_response = ""
+            chunk_times = []
             chunk_start = time.time()
 
-        progress_bar.close()
-        elapsed_time = time.time() - start_time
-        return full_response, elapsed_time, chunk_times
+            for chunk in stream:
+                content = chunk['message']['content']
+                full_response += content
+                progress_bar.update(len(content))
+                chunk_times.append(time.time() - chunk_start)
+                chunk_start = time.time()
+
+            progress_bar.close()
+            elapsed_time = time.time() - start_time
+            logging.info(f"Response received in {elapsed_time:.2f} seconds.")
+            return full_response, elapsed_time, chunk_times
+        except Exception as e:
+            logging.error(f"Error receiving LLM response: {e}")
+            return "", 0, []
 
     def calculate_metrics(self, response, elapsed_time, chunk_times):
-        word_count = len(response.split())
+        words = re.findall(r'\w+', response.lower())
+        word_count = len(words)
         char_count = len(response)
         sentence_count = len(re.findall(r'\w+[.!?]', response))
-        avg_word_length = char_count / word_count if word_count > 0 else 0
-        avg_sentence_length = word_count / sentence_count if sentence_count > 0 else 0
-
-        words = re.findall(r'\w+', response.lower())
         unique_words = len(set(words))
         vocabulary_richness = unique_words / word_count if word_count > 0 else 0
-
         avg_chunk_time = sum(chunk_times) / len(chunk_times) if chunk_times else 0
         response_rate = word_count / elapsed_time if elapsed_time > 0 else 0
 
+        # Get top words excluding stop words
         word_freq = Counter(word for word in words if word not in self.stop_words)
         top_words = word_freq.most_common(5)
 
@@ -117,8 +149,8 @@ class StreamingCybersecurityAnalyzer:
             'word_count': word_count,
             'char_count': char_count,
             'sentence_count': sentence_count,
-            'avg_word_length': avg_word_length,
-            'avg_sentence_length': avg_sentence_length,
+            'avg_word_length': char_count / word_count if word_count else 0,
+            'avg_sentence_length': word_count / sentence_count if sentence_count else 0,
             'vocabulary_richness': vocabulary_richness,
             'top_words': top_words
         }
@@ -127,38 +159,32 @@ class StreamingCybersecurityAnalyzer:
         csv_path = self.excel_to_csv()
         groups = self.prepare_data(csv_path)
 
-        # Process each conversation one by one
         for i, group in enumerate(groups, start=1):
             prompt = self.generate_prompt(group)
             response, elapsed_time, chunk_times = self.get_llama_response(prompt)
             metrics = self.calculate_metrics(response, elapsed_time, chunk_times)
 
-            # Store responses and metrics in memory
             self.responses.append(f"Conversation {i}:\n" + response)
             self.metrics_list.append(metrics)
 
-        # After processing all conversations, combine results and write to files
         self.save_combined_response_and_metrics()
 
     def save_combined_response_and_metrics(self):
-        # Create folder for saving responses and metrics if it doesn't exist
         os.makedirs(self.responses_folder, exist_ok=True)
 
-        # Combine all responses
         combined_response = "\n\n".join(self.responses)
-
-        # Consolidate all metrics
         consolidated_metrics = self.consolidate_metrics()
 
-        # Create a combined file with metrics at the top and response below
         combined_filename = f"{self.model_name}_combined_output_{datetime.now().strftime('%Y%m%d_%H%M')}.txt"
         combined_path = os.path.join(self.responses_folder, combined_filename)
-        with open(combined_path, "w") as combined_file:
-            combined_file.write(consolidated_metrics + "\n\n" + combined_response)
-        print(f"Combined Response and Metrics saved to: {combined_path}")
+        try:
+            with open(combined_path, "w") as combined_file:
+                combined_file.write(consolidated_metrics + "\n\n" + combined_response)
+            logging.info(f"Combined Response and Metrics saved to: {combined_path}")
+        except Exception as e:
+            logging.error(f"Error saving combined response and metrics: {e}")
 
     def consolidate_metrics(self):
-        # Aggregate metrics from all conversations
         total_elapsed_time = sum(m['elapsed_time'] for m in self.metrics_list)
         avg_response_rate = sum(m['response_rate'] for m in self.metrics_list) / len(self.metrics_list)
         total_word_count = sum(m['word_count'] for m in self.metrics_list)
@@ -169,13 +195,11 @@ class StreamingCybersecurityAnalyzer:
         avg_sentence_length = total_word_count / total_sentence_count if total_sentence_count > 0 else 0
         avg_vocabulary_richness = sum(m['vocabulary_richness'] for m in self.metrics_list) / len(self.metrics_list)
 
-        # Consolidate the top 5 most common words across all responses
         combined_word_freq = Counter()
         for metrics in self.metrics_list:
             combined_word_freq.update(dict(metrics['top_words']))
         top_5_words_combined = combined_word_freq.most_common(5)
 
-        # Format the consolidated metrics
         return f"""
 Consolidated Metrics:
 ===============================
@@ -193,7 +217,6 @@ Consolidated Metrics:
 
 3. Content Analysis:
    - Top 5 Most Common Words: {', '.join(f'{word} ({count})' for word, count in top_5_words_combined)}
-
 ===============================
 """
 
