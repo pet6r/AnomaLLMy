@@ -1,0 +1,90 @@
+
+Consolidated Metrics:
+===============================
+1. Performance Metrics:
+   - Total Elapsed Time: 305.17 seconds
+   - Average Response Rate: 2.01 words/second
+
+2. Content Metrics:
+   - Total Word Count: 625
+   - Total Character Count: 4009
+   - Total Sentence Count: 65
+   - Average Word Length: 6.41 characters
+   - Average Sentence Length: 9.62 words
+   - Average Vocabulary Richness: 0.6447
+
+3. Content Analysis:
+   - Top 5 Most Common Words: device (30), conversation (11), 1 (11), address (11), is (9)
+===============================
+
+
+Conversation 1:
+In this connection conversation, we have the following devices and their respective communication details:
+
+1. Device Identification:
+   - Source Device (SRCIP): 172.16.50.1
+   - Destination Device (DSTIP): 198.51.100.2
+   - Source MAC Address (SRCMAC): 00:1A:2B:3C:4D:5E
+   - Destination MAC Address (DSTMAC): 10:AB:CD:EF:12:34
+
+2. Communication Details:
+   - Source Device Manufacturer (SRCMFG): TechCorp
+   - Destination Device Manufacturer (DSTMFG): NetSys
+
+3. Traffic Volume:
+   - Total packets exchanged (CNT): 2785.0 outgoing from the source device and 2333.0 incoming to the destination device.
+
+4. Implications and Concerns: There seems to be a significant amount of traffic exchanged between these two devices, raising potential concerns about anomalous communication within the ICS environment. Further research is needed to understand the nature of this communication and determine if it poses any security risks.
+
+Conversation 2:
+Connection Analysis:
+
+Device Identification:
+- Device A (SRCIP: 172.16.60.1) is a part of the network with MAC address 00:1A:2B:3C:4D:5F, manufactured by TechCorp (SRCMFG).
+- Device B (DSTIP: 198.51.100.2) is connected to Device A with MAC address 10:AB:CD:EF:12:34, manufactured by NetSys (DS TMFG).
+
+Communication Details:
+- Devices communicate over TCP protocol.
+- Outgoing traffic from Device A uses ephemeral port EPH (port 443), while incoming traffic to Device B also uses the same ephemeral port.
+- The connection is established between TechCorp's device and NetSys' device.
+
+Traffic Volume:
+- Total packets exchanged (CNT) between the devices: 2,193 packets.
+
+Conversation 3:
+Conversation Analysis:
+
+1. Device Identification:
+   - In the first conversation, Device A (SRCIP: 172.16.50.1) is a TechCorp device with MAC address 00:1A:2B:3C:4D:5E.
+   - In the second conversation, Device B (SRCIP: 172.16.60.1) is also a TechCorp device with MAC address 00:1A:2B:3C:4D:5F.
+
+2. Communication Details:
+   - Conversation 1: Device A (TechCorp) communicates with an external IP address (203.0.113.6). Outgoing traffic is on port EPH (443), and incoming traffic is also on port EPH (443).
+   - Conversation 2: Device B (TechCorp) attempts to communicate with the same external IP address (203.0.113.6), but it seems likely that the connection was blocked, as there are only 1.0 packets exchanged.
+
+3. Traffic Volume:
+   - Conversation 1: A total of 2.0 packets were exchanged between Device A and the remote destination.
+   - Conversation 2: Only 1.0 packet was exchanged before the connection was likely blocked.
+
+4. Implications and Concerns:
+   - Conversation 1: This conversation represents an attempted remote access from Device A to an external IP address. Further research is needed to understand the nature of this communication and whether it poses a security risk.
+   - Conversation 2: The second conversation indicates that Device B tried to establish a connection, but it was likely blocked. This could be due to a firewall or another security mechanism in place. No immediate concerns are identified in this case.
+
+Note: EPH (Extended Port Hopping) is an ephemeral port used by devices in an ICS environment for establishing connections with other devices or external systems. Monitoring these ports helps identify potential security risks and unauthorized communications within the network.
+
+Conversation 4:
+Device Identification:
+    - Source device: IP address = 172.16.1.1, MAC address = 18:AA:BB:CC:DD:EE, Manufacturer (MFG) = IndustrialTech
+    - Destination device: IP address = 224.0.0.1, MAC address = 01:00:5E:AB:CD:EF
+
+Communication Details:
+    - Source device's IP address and port: N/A
+    - Destination device's IP address and port: N/A
+    - Protocol used: IGMP
+
+Traffic Volume:
+    - Total packets exchanged (CNT) = 3334.0
+
+Implications and Concerns:
+    - This connection is an IGMP discovery activity for both ARP and IGMP protocols.
+    - No immediate concerns, but further research may be needed to understand the nature of this traffic and its potential impact on the ICS environment.

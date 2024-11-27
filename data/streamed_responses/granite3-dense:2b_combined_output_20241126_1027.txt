@@ -1,0 +1,97 @@
+
+Consolidated Metrics:
+===============================
+1. Performance Metrics:
+   - Total Elapsed Time: 588.17 seconds
+   - Average Response Rate: 1.31 words/second
+
+2. Content Metrics:
+   - Total Word Count: 716
+   - Total Character Count: 4614
+   - Total Sentence Count: 74
+   - Average Word Length: 6.44 characters
+   - Average Sentence Length: 9.68 words
+   - Average Vocabulary Richness: 0.5520
+
+3. Content Analysis:
+   - Top 5 Most Common Words: is (26), device (16), port (12), address (11), connection (7)
+===============================
+
+
+Conversation 1:
+1. Device Identification:
+   - SRCIP: 172.16.50.1 (Manufacturer: TechCorp, MAC: 00:1A:2B:3C:4D:5E)
+   - DSTIP: 198.51.100.2 (Manufacturer: NetSys, MAC: 10:AB:CD:EF:12:34)
+
+2. Communication Details:
+   - MFG: TechCorp (SRCIP) and NetSys (DSTIP) are communicating using TCP protocol.
+   - Outgoing Port: EPH (Ephemeral port used in ICS environments)
+   - Incoming Port: 443 (HTTPS port)
+   - SRCPORT: EPH (Ephemeral port used in ICS environments)
+   - DSTPORT: 443 (HTTPS port)
+
+3. Traffic Volume:
+   - Total packets exchanged: 2785.0 (SRCIP to DSTIP) and 2333.0 (DSTIP to SRCIP)
+
+4. Implications and Concerns:
+   - The communication between these two devices is happening over a non-standard port (EPH) and IP addresses, which could indicate an attempt to bypass security measures.
+   - Further research is needed to determine the purpose of this communication and if it poses a threat to the ICS environment.
+
+Conversation 2:
+1. Device Identification:
+   - For the first connection, the source device is a TechCorp device with MAC address 00:1A:2B:3C:4D:5F and the destination device is a NetSys device with MAC address 10:AB:CD:EF:12:34.
+   - For the second connection, the source device is a NetSys device with MAC address 10:AB:CD:EF:12:34 and the destination device is a TechCorp device with MAC address 00:1A:2B:3C:4D:5F.
+
+2. Communication Details:
+   - For the first connection, the source device (TechCorp) is using port EPH for outgoing traffic and port 443 for incoming traffic. The destination device (NetSys) is also using port 443 for outgoing traffic and port EPH for incoming traffic.
+   - For the second connection, the communication details are the same as the first connection, but with reversed source and destination devices.
+
+3. Traffic Volume:
+   - For the first connection, there is a total of 1192.0 packets exchanged between the devices.
+   - For the second connection, there is a total of 1193.0 packets exchanged between the devices.
+
+4. Implications and Concerns:
+   - Both connections involve communication between devices on different networks (TechCorp and NetSys). The use of port EPH for outgoing traffic from both devices is unusual, as it is typically used for ephemeral connections in an ICS environment. This could indicate potential security risks or anomalous behavior that requires further research.
+
+Conversation 3:
+1. Device Identification:
+   - SRCIP: 172.16.50.1, Manufacturer: TechCorp, MAC Address: 00:1A:2B:3C:4D:5E
+   - DSTIP: 203.0.113.6, Manufacturer: NetSys, MAC Address: Not provided
+   - SRCPORT: EPH (Ephemeral port), DSTPORT: 443
+
+2. Communication Details:
+   - MFG: TechCorp and NetSys, IP Addresses: 172.16.50.1 and 203.0.113.6 respectively
+   - SRCPORT: EPH (Ephemeral port), DSTPORT: 443
+
+3. Traffic Volume:
+   - CNT: 2.0 packets exchanged between the devices.
+
+4. Implications and Concerns:
+   - This connection is an attempt at remote access, which is a security concern. The source IP address is from a local private network (172.16.50.1), while the destination IP address is external (203.0.113.6).
+   - The use of an ephemeral port (EPH) for outgoing traffic is unusual and may indicate malicious activity.
+   - The destination MAC address is not provided, which could be a concern as it might indicate that the connection is being routed through another device.
+   - Further research is needed to determine the exact nature of this connection and whether it poses a real threat to the ICS environment.
+
+Conversation 4:
+1. Device Identification:
+   - Source Device:
+     - IP Address: 172.16.1.1
+     - MAC Address: 18:AA:BB:CC:DD:EE
+     - Manufacturer: IndustrialTech
+   - Destination Device:
+     - IP Address: 224.0.0.1
+     - MAC Address: Not provided in the data
+     - Manufacturer: Not provided in the data
+
+2. Communication Details:
+   - The communication is between an IndustrialTech device (source) and another device with an unknown IP address (destination).
+   - The protocol used is IGMP (Internet Group Management Protocol), which is typically used for multicast group management in ICS environments.
+   - The source port is not provided (NaN), while the destination port is also not provided.
+
+3. Traffic Volume:
+   - Total packets exchanged: 3334.0
+
+4. Implications and Concerns:
+   - This connection is part of an anomaly as it was not in the baseline/allowlist.
+   - Further research is needed to determine the purpose of this communication, as the destination IP address and port information are missing.
+   - IGMP Discovery activity is common in ICS environments for managing multicast group membership, but the absence of source and destination ports could indicate unusual behavior.

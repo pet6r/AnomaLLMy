@@ -1,0 +1,93 @@
+
+Consolidated Metrics:
+===============================
+1. Performance Metrics:
+   - Total Elapsed Time: 35.86 seconds
+   - Average Response Rate: 21.94 words/second
+
+2. Content Metrics:
+   - Total Word Count: 776
+   - Total Character Count: 4931
+   - Total Sentence Count: 71
+   - Average Word Length: 6.35 characters
+   - Average Sentence Length: 10.93 words
+   - Average Vocabulary Richness: 0.5614
+
+3. Content Analysis:
+   - Top 5 Most Common Words: is (25), device (13), this (12), port (8), communication (8)
+===============================
+
+
+Conversation 1:
+1. Device Identification:
+   - SRCIP: 198.51.100.2, DSTIP: 172.16.50.1
+   - SRCPORT: EPH (Ephemeral Port), DSRCPORT: Not provided
+   - DSTMFG: TechCorp, DSTMFG: NetSys
+   - SRCIP: 198.51.100.2, DSTIP: Not provided
+   - DSTMAC: Not provided
+   - The connection is between TechCorp and NetSys, both from external locations.
+
+2. Communication Details:
+   - The devices are communicating over port EPH, which is a temporary or ephemeral port used in devices that do not have a permanent IP address.
+   - The incoming traffic on the DSRCPORT is from TechCorp (172.16.50.1), indicating that TechCorp is initiating the communication.
+   - The outgoing traffic on the EPH port is from NetSys to TechCorp (10:AB:CD:EF:12:34).
+
+3. Traffic Volume:
+   - The total sum of packets exchanged between the devices is CNT = 2. This indicates that two packets are being sent and received on the DSRCPORT.
+
+4. Implications and Concerns:
+   - The use of a temporary port (EPH) from an external location (NetSys to TechCorp) suggests that this connection might be related to a potential security breach or unauthorized access attempt. Further research is needed to determine the exact implications.
+
+Conversation 2:
+1. Device Identification:
+   - SRCIP: 198.51.100.2, DSTIP: 172.16.60.1
+   - SRCMAC: 00:1A:2B:3C:4D:5F
+   - SRCPORT: EPH (Established)
+   - DSTMFG: TechCorp
+   - DSTSFM: NetSys
+
+2. Communication Details:
+   - The devices are communicating over TCP on port 443 for outgoing traffic and receiving traffic from the same IP address on port 443 for incoming traffic.
+   - The communication is established between TechCorp's network (DstMFG) and NetSys's network (SrcMF).
+
+3. Traffic Volume:
+   - Total sum of packets exchanged: CNT = 2
+   - Notes: This indicates a ongoing two-way communication between the two networks on port 443. Further research is needed to understand the nature of this communication.
+
+4. Implications and Concerns:
+   - The continuous exchange of packets between these networks suggests a potential security threat or collaboration. Further investigation is required to determine the exact nature of this connection.
+
+Conversation 3:
+1. Device Identification:
+   - Device 1 (SRCIP, DSTIP): This device is associated with TechCorp NetSys from manufacturer MFG 'TechCorp'. It uses an MAC address of SRCMAC.
+   - Device 2 (DSTIP, DSTMONTH): This device is associated with TechCorp NetSys from manufacturer MFG 'TechCorp' as well, but it uses an MAC address of DSTMFG.
+
+2. Communication Details:
+   - Both devices are communicating over a TCP connection using the EPH port (443 in this case). The sender's IP is 172.16.50.1, and the receiver's IP is 172.16.60.1.
+   - The sender's IP address is attempting remote access to the receiver's network.
+
+3. Traffic Volume:
+   - The total sum of (CNT) packets exchanged between the devices is 2. This includes 1 packet for Device 1 and 1 packet for Device 2.
+
+4. Implications and Concerns:
+   - The fact that both devices are attempting remote access suggests a potential security threat. However, without further information about the nature of this connection, it's difficult to determine the exact scope or impact of the threat. Both devices appear to be in compliance with their allowlist, as they are not listed under any suspicious categories.
+
+Conversation 4:
+1. Device Identification:
+   - The device identified as "IndustrialTech" is from the manufacturer IndustrialTech (MFG) with a MAC address of 18:AA:BB:CC:DD:EE.
+   - The other device involved in this connection, DSTIP, is from the same manufacturer IndustrialTech but with a MAC address of 01:00:5E:AB:CD:EF.
+
+2. Communication Details:
+   - Both devices are communicating using IPv4 protocol ( PROTOCOL).
+   - The outgoing port used for this connection is NaN (Not Applicable) which suggests that the device DSTIP is responsible for initiating the communication and the receiving device SRCMAC is unknown or not provided in this data.
+   - The incoming port for this connection is 01:00:5E:AB:CD:EF (Unknown).
+   - It seems that there is an ongoing IP Discover (IGMP) operation between these two devices, which is a common practice in industrial control systems to establish communication channels.
+
+3. Traffic Volume:
+   - The total sum of packets exchanged between the devices is CNT, which is not provided in this data.
+
+4. Implications and Concerns:
+   - The ongoing IGMP operation suggests that these two devices are part of an industrial control system that uses this protocol for communication. However, without knowing the receiving device's IP address or the status of the IP Discover operation, it is difficult to determine the exact implications. It may be crucial to investigate further to ensure the security and stability of the industrial process.
+
+Notes:
+   - The CSV file is a sample data provided for analysis. In a real-world scenario, this information would not have been part of a baseline or allowlist and would have been picked up as an anomaly.
