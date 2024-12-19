@@ -43,6 +43,9 @@ class StreamingCybersecurityAnalyzer:
         3. Traffic Volume: Calculate the total sum of (CNT) packets exchanged between the devices.
         4. Implications and Concerns: Analyze what is happening within each conversation. Explain if it needs further research. Note: If these connections are in the csv file it means that they weren't
         a part of the baseline/allowlist. They were picked up as an anomaly.
+        
+        Layout:
+        - Use "-" as bullet points.
         """
 
         # Lists to store responses and metrics for all conversations
