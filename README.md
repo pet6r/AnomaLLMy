@@ -1,6 +1,6 @@
 # AnomaLLMy
 
-AnomaLLMy transforms Industrial Control Systems (ICS) network security by using Local Large Language Models (LLMs) to detect and analyze anomalous connections. This tool automates the process of interpreting network data, identifying potential threats, and generating actionable reports for cybersecurity teams.
+AnomaLLMy transforms Industrial Control Systems (ICS) network security by utilizing Local Large Language Models (LLMs) to detect and analyze anomalous connections. This tool automates the process of interpreting network data, identifying potential threats, and generating reports for cybersecurity teams.
 
 ## Setup
 
