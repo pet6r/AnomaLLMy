@@ -1,4 +1,4 @@
-# cross_platform_anomaly_detector.py
+# continuous_network_anomaly_detector.py
 import pickle
 import argparse
 import sys
@@ -29,6 +29,7 @@ RUNNING = True
 LAST_EXPORT_TIME = time.time()
 EXPORT_INTERVAL = 600  # 10 minutes in seconds
 OUTPUT_DIR = "anomaly_logs"
+FORCE_EXPORT = False   # Flag to force export even if no anomalies
 
 # Define relative path to baseline directory
 BASELINE_DIR = Path(__file__).resolve().parent.parent / "baseline" / "pickle_files"
@@ -183,27 +184,33 @@ def format_port(port, protocol):
 
 def signal_handler(sig, frame):
     """Handle Ctrl+C and other termination signals gracefully."""
-    global RUNNING
+    global RUNNING, FORCE_EXPORT
     print("\nReceived termination signal. Finishing current processing and exporting data...")
     RUNNING = False
+    FORCE_EXPORT = True
 
 def check_and_export_csv():
     """Check if it's time to export the CSV file and do so if needed."""
-    global LAST_EXPORT_TIME, CONNECTION_STATS
+    global LAST_EXPORT_TIME, CONNECTION_STATS, FORCE_EXPORT
 
     current_time = time.time()
-    if (current_time - LAST_EXPORT_TIME >= EXPORT_INTERVAL) and CONNECTION_STATS:
+    # Export if it's time AND there are anomalies, OR if export is forced
+    if ((current_time - LAST_EXPORT_TIME >= EXPORT_INTERVAL) and CONNECTION_STATS) or FORCE_EXPORT:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_file = os.path.join(OUTPUT_DIR, f"anomalies_{timestamp}.csv")
 
         # Write the CSV file
-        write_anomalies_to_csv(output_file)
+        if CONNECTION_STATS:
+            write_anomalies_to_csv(output_file)
+            print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Exported anomalies to {output_file}")
+        else:
+            print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] No anomalies detected during this interval. No CSV created.")
 
         # Reset the connection stats and update the last export time
         CONNECTION_STATS = defaultdict(int)
         LAST_EXPORT_TIME = current_time
+        FORCE_EXPORT = False
 
-        print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Exported anomalies to {output_file} and reset counters.")
         return True
 
     return False
@@ -349,9 +356,6 @@ def process_packet_combined_check(packet):
         conn_key = get_connection_key(packet, protocol)
         CONNECTION_STATS[conn_key] += 1
 
-        # Check if it's time to export the CSV
-        check_and_export_csv()
-
 def get_platform_specific_filter():
     """Returns the appropriate packet filter for the current platform."""
     system = platform.system().lower()
@@ -387,7 +391,7 @@ def get_platform_specific_filter():
 def main():
     global EXPORT_INTERVAL, OUTPUT_DIR, RUNNING, LAST_EXPORT_TIME
 
-    parser = argparse.ArgumentParser(description="Cross-Platform Network Anomaly Detector - Exports anomalies every 10 minutes")
+    parser = argparse.ArgumentParser(description="Continuous Network Anomaly Detector - Exports anomalies every 10 minutes")
 
     # Default paths calculated relative to the script location
     default_oui_baseline = BASELINE_DIR / "oui_baseline.pkl"
@@ -433,7 +437,7 @@ def main():
 
     print(f"""
 ╔════════════════════════════════════════════════╗
-║     CROSS-PLATFORM NETWORK ANOMALY DETECTOR    ║
+║     CONTINUOUS NETWORK ANOMALY DETECTOR        ║
 ╚════════════════════════════════════════════════╝
 """)
     print(f"CSV files will be saved to: {OUTPUT_DIR}")
@@ -479,22 +483,32 @@ def main():
     print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Starting continuous packet capture...")
     print("Press Ctrl+C to stop the detector and save final results.")
 
+    # Main loop with timeout monitoring
+    last_status_time = time.time()
+    status_interval = 60  # Print status every minute
+
     try:
-        # Start continuous sniffing - note the store=0 which is important for memory efficiency in 24/7 operation
+        # Start continuous sniffing
         while RUNNING:
+            # Check if it's time for interval export
+            current_time = time.time()
+            if current_time - LAST_EXPORT_TIME >= EXPORT_INTERVAL:
+                check_and_export_csv()
+
+            # Print periodic status to show it's still running
+            if current_time - last_status_time >= status_interval:
+                print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Still monitoring... ({len(CONNECTION_STATS)} anomalies detected in current interval)")
+                last_status_time = current_time
+
             try:
-                # Capture packets in smaller batches to allow for periodic CSV exports
-                # Use filter only if one is specified (to avoid filter errors on some platforms)
+                # Capture packets in smaller batches (timeout = 10 seconds)
+                # This allows for more frequent checks of the export interval
                 if packet_filter:
                     sniff(iface=args.iface, filter=packet_filter, prn=process_packet_combined_check,
-                          count=1000, store=0, timeout=60)
+                          count=500, store=0, timeout=10)
                 else:
                     sniff(iface=args.iface, prn=process_packet_combined_check,
-                          count=1000, store=0, timeout=60)
-
-                # Check if we should export even if we didn't hit any anomalies during sniffing
-                if time.time() - LAST_EXPORT_TIME >= EXPORT_INTERVAL and CONNECTION_STATS:
-                    check_and_export_csv()
+                          count=500, store=0, timeout=10)
 
             except Exception as e:
                 print(f"Error during packet capture: {e}", file=sys.stderr)
