@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # network_anomaly_detector.py
 import pickle
 import argparse
@@ -15,23 +16,32 @@ from collections import defaultdict
 # Import necessary Scapy layers
 from scapy.all import sniff, rdpcap, Ether, IP, TCP, UDP, ICMP, ARP, IPv6, Packet
 
-# Global variables
+# --- Global Variables ---
+# For Anomaly Detection (Whitelist)
 BASELINE_DATA = {
     'known_ouis': {},
     'allowed_protocols': set()
 }
 
-# Global dictionary to track connection counts
+# For Manufacturer Name Lookup (Comprehensive List)
+COMPREHENSIVE_OUI_LOOKUP = {}
+
+# For Tracking Anomalies
 CONNECTION_STATS = defaultdict(int)
 
-# Continuous run control
+# Control Variables
 RUNNING = True
 LAST_EXPORT_TIME = time.time()
 EXPORT_INTERVAL = 600  # 10 minutes in seconds
 OUTPUT_DIR = "anomaly_logs"
+FORCE_EXPORT = False   # Flag to force export even if no anomalies
 
 # Define relative path to baseline directory
+# Assumes baseline/pickle_files is two levels up from the script's directory
 BASELINE_DIR = Path(__file__).resolve().parent.parent / "baseline" / "pickle_files"
+# Default path for the comprehensive OUI file
+DEFAULT_COMPREHENSIVE_OUI_PATH = BASELINE_DIR / "oui_comprehensive.pkl"
+
 
 # --- Helper Functions ---
 def normalize_mac_to_oui(mac_address):
@@ -44,31 +54,32 @@ def normalize_mac_to_oui(mac_address):
             return oui_part
     return None
 
+# <<< MODIFIED get_manufacturer >>>
 def get_manufacturer(mac_address):
-    """Gets the manufacturer name for a MAC address using the known OUIs database."""
-    global BASELINE_DATA
+    """
+    Gets the manufacturer name for a MAC address using the
+    COMPREHENSIVE OUI lookup dictionary.
+    """
+    global COMPREHENSIVE_OUI_LOOKUP # Use the comprehensive list
+
     if not mac_address: return "UNKNOWN"
 
     oui = normalize_mac_to_oui(mac_address)
     if not oui: return "UNKNOWN"
 
-    # Special case for broadcast/multicast
-    if mac_address.lower() == "ff:ff:ff:ff:ff:ff":
+    # Special case for broadcast/multicast (handled before lookup)
+    mac_lower = mac_address.lower()
+    if mac_lower == "ff:ff:ff:ff:ff:ff":
         return "BROADCAST"
-
-    # Check if first byte has the multicast bit set (least significant bit of first octet)
     try:
         first_byte = int(mac_address.split(':')[0], 16)
         if (first_byte & 1) == 1:
             return "MULTICAST"
     except (ValueError, IndexError):
-        pass
+        pass # Ignore malformed MACs for multicast check
 
-    # Look up in the known OUIs database
-    if oui in BASELINE_DATA['known_ouis']:
-        return BASELINE_DATA['known_ouis'][oui]
-
-    return "UNKNOWN"
+    # Look up in the COMPREHENSIVE OUIs database
+    return COMPREHENSIVE_OUI_LOOKUP.get(oui, "UNKNOWN") # Use .get for safety
 
 def get_connection_key(packet, protocol):
     """Creates a unique key for a connection to track connection counts."""
@@ -79,12 +90,17 @@ def get_connection_key(packet, protocol):
         src_mac = packet[Ether].src
         dst_mac = packet[Ether].dst
 
+    # Handle IPv4 and IPv6 for IP addresses
     if IP in packet:
         src_ip = packet[IP].src
         dst_ip = packet[IP].dst
     elif IPv6 in packet:
         src_ip = packet[IPv6].src
         dst_ip = packet[IPv6].dst
+    elif ARP in packet: # Get IPs from ARP if available
+        src_ip = packet[ARP].psrc
+        dst_ip = packet[ARP].pdst
+
 
     if TCP in packet:
         src_port = str(packet[TCP].sport)
@@ -94,440 +110,490 @@ def get_connection_key(packet, protocol):
         dst_port = str(packet[UDP].dport)
 
     # Create a connection key that uniquely identifies this flow
-    key = f"{protocol}|{src_mac}|{src_ip}|{src_port}|{dst_mac}|{dst_ip}|{dst_port}"
+    # Using consistent placeholders for missing elements if needed
+    key = f"{protocol}|{src_mac or 'N/A'}|{src_ip or 'N/A'}|{src_port or 'N/A'}|{dst_mac or 'N/A'}|{dst_ip or 'N/A'}|{dst_port or 'N/A'}"
     return key
 
+# <<< REVISED load_baseline >>>
 def load_baseline(baseline_file, expected_key):
-    """Loads data from a pickle file and merges it into the global BASELINE_DATA."""
+    """
+    Loads data from a WHITELIST baseline pickle file (OUI or Protocol)
+    and merges it into the global BASELINE_DATA.
+    Returns True on success, False on failure.
+    """
     global BASELINE_DATA
-    print(f"Loading baseline file: {baseline_file} (expecting key: '{expected_key}')...")
+    # Determine descriptive name based on the key
+    baseline_type = "Unknown"
+    if expected_key == 'known_ouis':
+        baseline_type = "Known Device OUI Whitelist"
+    elif expected_key == 'allowed_protocols':
+        baseline_type = "Allowed Protocol Whitelist"
+
+    print(f"Loading {baseline_type}: {baseline_file} (key: '{expected_key}')...") # Use descriptive name
     try:
         with open(baseline_file, 'rb') as f:
             data = pickle.load(f)
 
-        if not isinstance(data, dict) or expected_key not in data:
-            print(f"Error: Baseline file '{baseline_file}' is missing expected key '{expected_key}' or is not a dictionary.", file=sys.stderr)
-            return False # Indicate failure
+        # Allow loading direct dict/set or nested structure
+        data_to_load = None
+        if isinstance(data, dict) and expected_key in data:
+             data_to_load = data[expected_key]
+        elif expected_key == 'known_ouis' and isinstance(data, dict):
+             data_to_load = data
+        elif expected_key == 'allowed_protocols' and isinstance(data, set):
+             data_to_load = data
 
-        # Specific validation based on key
+        if data_to_load is None:
+            print(f"Error: Whitelist file '{baseline_file}' has unexpected format or missing key '{expected_key}'.", file=sys.stderr)
+            return False
+
+        # Specific validation and update based on key
         if expected_key == 'known_ouis':
-            if not isinstance(data['known_ouis'], dict):
-                 print(f"Error: Key 'known_ouis' in '{baseline_file}' should contain a dictionary.", file=sys.stderr)
+            if not isinstance(data_to_load, dict):
+                 print(f"Error: Data for 'known_ouis' in '{baseline_file}' is not a dictionary.", file=sys.stderr)
                  return False
-            BASELINE_DATA['known_ouis'].update(data['known_ouis']) # Merge dictionaries
-            print(f" - Loaded/Updated {len(data['known_ouis'])} OUI entries. Total known OUIs: {len(BASELINE_DATA['known_ouis'])}")
+            BASELINE_DATA['known_ouis'].update(data_to_load)
+            # Updated print statement for clarity
+            print(f" - Loaded/Updated {len(data_to_load)} OUI entries. Total known Whitelist OUIs: {len(BASELINE_DATA['known_ouis'])}")
 
         elif expected_key == 'allowed_protocols':
-            if not isinstance(data['allowed_protocols'], set):
-                 print(f"Error: Key 'allowed_protocols' in '{baseline_file}' should contain a set.", file=sys.stderr)
+            if not isinstance(data_to_load, set):
+                 print(f"Error: Data for 'allowed_protocols' in '{baseline_file}' is not a set.", file=sys.stderr)
                  return False
-            BASELINE_DATA['allowed_protocols'].update(data['allowed_protocols']) # Merge sets
-            print(f" - Loaded/Updated {len(data['allowed_protocols'])} protocol entries. Total allowed protocols: {len(BASELINE_DATA['allowed_protocols'])}")
-
+            BASELINE_DATA['allowed_protocols'].update(data_to_load)
+            # Updated print statement for clarity
+            print(f" - Loaded/Updated {len(data_to_load)} protocol entries. Total Allowed Protocols: {len(BASELINE_DATA['allowed_protocols'])}")
         else:
-             print(f"Warning: Unknown expected key '{expected_key}' during loading.", file=sys.stderr)
+             print(f"Warning: Unknown expected key '{expected_key}' during baseline loading.", file=sys.stderr)
 
         return True # Indicate success
 
     except FileNotFoundError:
-        print(f"Error: Baseline file '{baseline_file}' not found.", file=sys.stderr)
+        print(f"Error: Whitelist file '{baseline_file}' not found.", file=sys.stderr)
         return False
     except pickle.UnpicklingError:
-        print(f"Error: Could not unpickle baseline file '{baseline_file}'.", file=sys.stderr)
+        print(f"Error: Could not unpickle Whitelist file '{baseline_file}'.", file=sys.stderr)
         return False
     except Exception as e:
-        print(f"Error loading baseline file '{baseline_file}': {e}", file=sys.stderr)
+        print(f"Error loading Whitelist file '{baseline_file}': {e}", file=sys.stderr)
         return False
 
 def get_packet_protocol(packet: Packet) -> str | None:
     """Tries to determine the primary protocol name from a Scapy packet."""
-    if ARP in packet:
-        return "ARP"
-    elif ICMP in packet and IP in packet: # ICMP for IPv4
-        return "ICMP"
-    elif ICMP in packet and IPv6 in packet: # ICMPv6 Check
-         if packet.haslayer(IPv6) and packet[IPv6].nh == 58: # 58 is the protocol number for ICMPv6
-             return "IPV6-ICMP"
-    elif TCP in packet:
-        return "TCP"
-    elif UDP in packet:
-        return "UDP"
-    elif IPv6 in packet:
-        proto_name = packet[IPv6].sprintf("%IPv6.nh%").upper()
-        if "ICMP" in proto_name: return "IPV6-ICMP"
-        return proto_name if proto_name != "??" else None
-    elif IP in packet:
-        proto_name = packet[IP].sprintf("%IP.proto%").upper()
-        if "ICMP" in proto_name and "V6" in proto_name: return "IPV6-ICMP"
-        if "ICMP" in proto_name: return "ICMP"
-        return proto_name if proto_name != "??" else None
-    elif Ether in packet:
+    # Order matters: Check more specific layers first
+    if TCP in packet: return "TCP"
+    if UDP in packet: return "UDP"
+    # Check ICMP variations after TCP/UDP
+    if ICMP in packet and IPv6 in packet: return "IPV6-ICMP" # Check if ICMP is carried by IPv6
+    if ICMP in packet: return "ICMP" # Assume IPv4 if not IPv6
+    if ARP in packet: return "ARP"
+    # Less common protocols / Layer 2/3 identification
+    if IPv6 in packet: return packet[IPv6].sprintf("%IPv6.nh%").upper() # Next header field
+    if IP in packet: return packet[IP].sprintf("%IP.proto%").upper() # Protocol field
+    if Ether in packet: # Identify some common EtherTypes if no IP layer found
         etype = packet[Ether].type
-        if etype == 0x86DD: return "IPV6"
+        if etype == 0x86DD: return "IPV6" # EtherType for IPv6
         if etype == 0x88CC: return "LLDP"
-    return None
+        # Add others if needed, e.g., 0x88A8 (Provider Bridging), 0x8100 (VLAN)
+        return f"ETH-{hex(etype)}" # Generic EtherType
+    return None # Cannot determine protocol
 
 def format_port(port, protocol):
     """Format port numbers for the CSV output, handling ephemeral ports."""
-    if not port:
+    if not port or protocol not in ["TCP", "UDP"]: # Only format ports for TCP/UDP
         return ""
-
     try:
         port_num = int(port)
-        # Check if it's an ephemeral port (typically > 1024)
-        if port_num > 1024 and protocol in ["TCP", "UDP"]:
+        # Use IANA suggested ephemeral range (adjust if needed)
+        if port_num > 49151:
             return "EPH"
-        return port
+        # Or optionally treat > 1024 as ephemeral
+        # if port_num > 1024:
+        #     return "EPH"
+        return str(port_num) # Return as string if not ephemeral
     except (ValueError, TypeError):
-        return port
+        return str(port) # Return original if conversion fails
 
 def signal_handler(sig, frame):
     """Handle Ctrl+C and other termination signals gracefully."""
-    global RUNNING
-    print("\nReceived termination signal. Finishing current processing and exporting data...")
-    RUNNING = False
+    global RUNNING, FORCE_EXPORT
+    if RUNNING: # Prevent multiple prints if signal received quickly
+        print("\n[!] Termination signal received. Stopping capture and exporting final data...", file=sys.stderr)
+        RUNNING = False
+        FORCE_EXPORT = True # Ensure final export happens
 
 def check_and_export_csv():
     """Check if it's time to export the CSV file and do so if needed."""
-    global LAST_EXPORT_TIME, CONNECTION_STATS
+    global LAST_EXPORT_TIME, CONNECTION_STATS, FORCE_EXPORT, OUTPUT_DIR # Ensure OUTPUT_DIR is global
 
     current_time = time.time()
-    if (current_time - LAST_EXPORT_TIME >= EXPORT_INTERVAL) and CONNECTION_STATS:
+    # Export if it's time AND there are anomalies, OR if export is forced by signal
+    should_export = ((current_time - LAST_EXPORT_TIME >= EXPORT_INTERVAL) and CONNECTION_STATS) or FORCE_EXPORT
+
+    if should_export:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_file = os.path.join(OUTPUT_DIR, f"anomalies_{timestamp}.csv")
+        # Ensure OUTPUT_DIR is treated as a Path object for consistency if needed elsewhere
+        # Or convert to string here
+        output_file = os.path.join(str(OUTPUT_DIR), f"anomalies_{timestamp}.csv")
 
-        # Write the CSV file
-        write_anomalies_to_csv(output_file)
+        if CONNECTION_STATS:
+            print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Exporting {len(CONNECTION_STATS)} anomalies to {output_file}...")
+            write_anomalies_to_csv(output_file) # Call the writer function
+        elif FORCE_EXPORT: # Only print "no anomalies" if forced export had nothing
+             print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Shutdown initiated, no anomalies detected in the final interval.")
+        else: # Standard interval check found nothing
+             print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] No anomalies detected during this interval.")
 
-        # Reset the connection stats and update the last export time
+        # Reset stats and timer ONLY if export happened (or was supposed to)
         CONNECTION_STATS = defaultdict(int)
         LAST_EXPORT_TIME = current_time
+        FORCE_EXPORT = False # Reset force flag after attempting export
 
-        print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Exported anomalies to {output_file} and reset counters.")
-        return True
+        return True # Indicate export was attempted
 
-    return False
+    return False # Indicate no export occurred
+
 
 def write_anomalies_to_csv(output_file):
-    """Write the collected anomalies to a CSV file in the specified format."""
+    """
+    Write the collected anomalies to a CSV file, grouped by connection endpoints
+    (ignoring ports for grouping) and separated by newlines.
+    Uses the COMPREHENSIVE OUI list to get manufacturer names.
+    """
     global CONNECTION_STATS
 
-    # If no anomalies were detected, don't create an empty file
     if not CONNECTION_STATS:
-        print("No anomalies detected, CSV file not created.")
+        # No print here, handled by check_and_export_csv
         return
 
-    print(f"Writing {len(CONNECTION_STATS)} anomalous connections to {output_file}...")
+    # Use a temporary dictionary to group connections by endpoint (ignoring ports)
+    grouped_connections = defaultdict(list)
+    fieldnames = ['PROTOCOL', 'SRCMAC', 'SRCMFG', 'SRCIP', 'SRCPORT',
+                  'DSTMAC', 'DSTMFG', 'DSTIP', 'DSTPORT', 'CNT']
 
+    # --- Step 1: Group connections by endpoint ---
+    for conn_key, count in CONNECTION_STATS.items():
+        parts = conn_key.split('|')
+        if len(parts) != 7:
+            print(f"Warning: Skipping malformed connection key in CSV grouping: {conn_key}", file=sys.stderr)
+            continue
+
+        protocol, src_mac, src_ip, src_port_raw, dst_mac, dst_ip, dst_port_raw = parts
+
+        # Create the key for grouping (excludes ports)
+        group_key = f"{protocol}|{src_mac}|{src_ip}|{dst_mac}|{dst_ip}"
+
+        # Get manufacturer information using the COMPREHENSIVE lookup
+        src_mfg = get_manufacturer(src_mac if src_mac != 'N/A' else None)
+        dst_mfg = get_manufacturer(dst_mac if dst_mac != 'N/A' else None)
+
+        # Format ports for display
+        src_port_formatted = format_port(src_port_raw if src_port_raw != 'N/A' else None, protocol)
+        dst_port_formatted = format_port(dst_port_raw if dst_port_raw != 'N/A' else None, protocol)
+
+        # Store the full connection details needed for the final row
+        conn_details = {
+            'PROTOCOL': protocol,
+            'SRCMAC': src_mac,
+            'SRCMFG': src_mfg,
+            'SRCIP': src_ip,
+            'SRCPORT': src_port_formatted,
+            'DSTMAC': dst_mac,
+            'DSTMFG': dst_mfg,
+            'DSTIP': dst_ip,
+            'DSTPORT': dst_port_formatted,
+            'CNT': f"{count}.0" # Format count as requested
+        }
+        # Append the details to the list associated with the group key
+        grouped_connections[group_key].append(conn_details)
+
+    # --- Step 2: Write the grouped connections to CSV with separators ---
     try:
-        with open(output_file, 'w', newline='') as csvfile:
-            # Define the CSV header
-            fieldnames = ['PROTOCOL', 'SRCMAC', 'SRCMFG', 'SRCIP', 'SRCPORT',
-                         'DSTMAC', 'DSTMFG', 'DSTIP', 'DSTPORT', 'CNT']
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
+        with open(output_file, 'w', newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
 
-            # Group the connections by their characteristics
-            grouped_connections = defaultdict(list)
-
-            for conn_key, count in CONNECTION_STATS.items():
-                # Split the connection key back into its components
-                parts = conn_key.split('|')
-                if len(parts) < 7:
-                    continue  # Skip malformed keys
-
-                protocol, src_mac, src_ip, src_port, dst_mac, dst_ip, dst_port = parts
-
-                # Get manufacturer information
-                src_mfg = get_manufacturer(src_mac)
-                dst_mfg = get_manufacturer(dst_mac)
-
-                # Format ports for display
-                src_port_formatted = format_port(src_port, protocol)
-                dst_port_formatted = format_port(dst_port, protocol)
-
-                # Create a connection group key (without ports for grouping related connections)
-                group_key = f"{protocol}:{src_mac}:{dst_mac}:{src_ip}:{dst_ip}"
-
-                # Store the full connection details with the count
-                conn_details = {
-                    'PROTOCOL': protocol,
-                    'SRCMAC': src_mac,
-                    'SRCMFG': src_mfg,
-                    'SRCIP': src_ip,
-                    'SRCPORT': src_port_formatted,
-                    'DSTMAC': dst_mac,
-                    'DSTMFG': dst_mfg,
-                    'DSTIP': dst_ip,
-                    'DSTPORT': dst_port_formatted,
-                    'CNT': f"{count}.0"  # Format as requested
-                }
-
-                grouped_connections[group_key].append(conn_details)
-
-            # Write each group of connections with blank lines between groups
             first_group = True
-            for group, connections in grouped_connections.items():
-                # Add blank line before groups (except the first one)
+            # Iterate through the groups we created
+            for group_key, connections_in_group in grouped_connections.items():
+                # Add blank line separator before each group (except the first)
                 if not first_group:
+                    # Create an empty row dictionary matching fieldnames
                     writer.writerow(dict.fromkeys(fieldnames, ''))
                 else:
                     first_group = False
 
-                # Write all connections in this group
-                for conn in connections:
-                    writer.writerow(conn)
+                # Write all connections belonging to this group
+                for conn_detail_row in connections_in_group:
+                    writer.writerow(conn_detail_row)
 
-        print(f"CSV file written successfully to {output_file}")
+        # Success message moved to check_and_export_csv for better flow
 
     except Exception as e:
-        print(f"Error writing CSV file: {e}", file=sys.stderr)
+        print(f"Error writing grouped CSV file '{output_file}': {e}", file=sys.stderr)
 
 
 # --- Packet Processing ---
 def process_packet_combined_check(packet):
     """
-    Processes a single packet, checking its OUI and Protocol against loaded baselines.
+    Processes a single packet, checking its OUI and Protocol against ANOMALY baselines.
     Records anomalies in the global CONNECTION_STATS dictionary.
+    Does NOT use the comprehensive OUI list for anomaly check.
     """
     global BASELINE_DATA, CONNECTION_STATS, RUNNING
 
-    # Check if we should still be running
-    if not RUNNING:
-        return
+    if not RUNNING: return # Check if shutdown signal received
 
-    # Skip processing if no baseline data
-    if not BASELINE_DATA or not BASELINE_DATA['known_ouis'] or not BASELINE_DATA['allowed_protocols']:
-        if not hasattr(process_packet_combined_check, "warned_no_baseline"):
-             print("Warning: Baseline data (OUI or Protocol) is missing or empty. Checks may be ineffective.", file=sys.stderr)
-             process_packet_combined_check.warned_no_baseline = True
-        return
+    # Use baseline data loaded previously for checks
+    # Ensure keys exist before accessing
+    known_ouis = BASELINE_DATA.get('known_ouis', {})
+    allowed_protocols = BASELINE_DATA.get('allowed_protocols', set())
 
-    known_ouis = BASELINE_DATA['known_ouis']
-    allowed_protocols = BASELINE_DATA['allowed_protocols']
+    # Skip if baselines are empty (optional, prevents useless checks)
+    # if not known_ouis and not allowed_protocols:
+    #      return
+
     anomaly_found = False
+    protocol = get_packet_protocol(packet) # Determine protocol early
 
-    # --- 1. OUI Check ---
+    # --- 1. OUI Check (using ANOMALY baseline) ---
     if Ether in packet:
         src_mac = packet[Ether].src
         dst_mac = packet[Ether].dst
         src_oui = normalize_mac_to_oui(src_mac)
         dst_oui = normalize_mac_to_oui(dst_mac)
 
-        # Check Source OUI
+        # Check Source OUI against ANOMALY baseline
         if src_oui and src_oui not in known_ouis:
             anomaly_found = True
 
-        # Check Destination OUI (if unicast)
+        # Check Destination OUI against ANOMALY baseline (if unicast)
         if dst_oui:
-            is_broadcast = dst_mac == "ff:ff:ff:ff:ff:ff"
+            is_broadcast = dst_mac.lower() == "ff:ff:ff:ff:ff:ff"
             is_multicast = False
-            try:
-                if (int(dst_oui[:2], 16) & 1) == 1: is_multicast = True
+            try: # Check multicast bit
+                if not is_broadcast and (int(dst_oui[:2], 16) & 1) == 1: is_multicast = True
             except ValueError: pass
 
             if not is_broadcast and not is_multicast and dst_oui not in known_ouis:
                  anomaly_found = True
 
-    # --- 2. Protocol Check ---
-    protocol = get_packet_protocol(packet)
-
+    # --- 2. Protocol Check (using ANOMALY baseline) ---
     if protocol:
-        protocol = protocol.upper()
-        if protocol not in allowed_protocols:
+        protocol_upper = protocol.upper() # Compare uppercase
+        if protocol_upper not in allowed_protocols:
             anomaly_found = True
-    elif Ether in packet:
-        etype = packet[Ether].type
-        common_types = {0x0800, 0x0806, 0x86DD}
-        if etype not in common_types:
-            anomaly_found = True
-            protocol = f"UNKNOWN-{hex(etype)}"  # Use a placeholder protocol name for recording
+    # Optional: Consider handling packets where protocol couldn't be determined
+    # elif Ether in packet: # Example: Flag unknown EtherTypes
+    #     etype = packet[Ether].type
+    #     # Define known/expected EtherTypes if needed
+    #     known_etypes = {0x0800, 0x0806, 0x86DD, 0x8100, 0x88A8, 0x88CC}
+    #     if etype not in known_etypes:
+    #         anomaly_found = True
+    #         protocol = f"ETH-{hex(etype)}" # Use placeholder if protocol is None
 
-    # Record the connection statistics if we found an anomaly
+    # --- Record Anomaly ---
+    # Record if an anomaly was found AND we could determine a protocol name
     if anomaly_found and protocol:
         conn_key = get_connection_key(packet, protocol)
         CONNECTION_STATS[conn_key] += 1
 
-        # Check if it's time to export the CSV
-        check_and_export_csv()
 
 def get_platform_specific_filter():
-    """Returns the appropriate packet filter for the current platform."""
-    system = platform.system().lower()
-
-    # Different platforms might need different filter expressions
-    if system == "darwin":  # macOS
-        # On macOS, simple filter expressions work better
-        return ""  # Empty string means no filter - capture all packets
-    elif system == "linux":
-        # On Linux, 'ether' is widely supported
-        return "ether"
-    elif system == "windows":
-        # On Windows, specific filters depend on the capture library
-        # Empty filter is safer but less efficient
-        return ""
-    else:
-        # Default to empty filter for unknown platforms
-        return ""
+    """Returns a suggested default packet filter (can be empty)."""
+    # Keep it simple, empty filter captures most things Scapy can parse.
+    # Specific filters ("tcp or udp...") might miss things or cause issues.
+    # User can override with -f if needed.
+    print("Using empty default filter (captures common layers). Override with -f if needed.")
+    return ""
 
 # --- Main Execution ---
 def main():
-    global EXPORT_INTERVAL, OUTPUT_DIR, RUNNING, LAST_EXPORT_TIME
+    # Make sure all accessed globals are declared if modified
+    global EXPORT_INTERVAL, OUTPUT_DIR, RUNNING, LAST_EXPORT_TIME, BASELINE_DATA, COMPREHENSIVE_OUI_LOOKUP, CONNECTION_STATS
 
-    parser = argparse.ArgumentParser(description="Cross-Platform Network Anomaly Detector - Exports anomalies every 10 minutes")
+    parser = argparse.ArgumentParser(
+        description="Continuous Network Anomaly Detector using Scapy.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        )
 
-    # Default paths calculated relative to the script location
+    # --- Argument Parsing ---
     default_oui_baseline = BASELINE_DIR / "oui_baseline.pkl"
     default_protocol_baseline = BASELINE_DIR / "protocol_baseline.pkl"
+    # Use the constant defined earlier for the comprehensive default path
+    default_comp_oui_path = DEFAULT_COMPREHENSIVE_OUI_PATH
 
+    # Anomaly Detection Baselines
     parser.add_argument("-ob", "--oui-baseline", default=str(default_oui_baseline),
-                        help=f"Path to the OUI baseline pickle file (default: {default_oui_baseline}).")
+                        help="Path to the OUI baseline pickle file (for ANOMALY detection).")
     parser.add_argument("-pb", "--protocol-baseline", default=str(default_protocol_baseline),
-                        help=f"Path to the Protocol baseline pickle file (default: {default_protocol_baseline}).")
+                        help="Path to the Protocol baseline pickle file (for ANOMALY detection).")
+    # Comprehensive Lookup Baseline
+    parser.add_argument("-cb", "--comprehensive-baseline", default=str(default_comp_oui_path),
+                        help="Path to the COMPREHENSIVE OUI pickle file (for manufacturer name lookup).")
+    # Required arguments
     parser.add_argument("-i", "--iface", required=True,
-                        help="Network interface name to sniff live traffic (e.g., eth0/en0/wlan0).")
+                        help="Network interface name for live capture (e.g., eth0, en0).")
+    # Optional arguments
     parser.add_argument("-o", "--output-dir", default=OUTPUT_DIR,
-                        help=f"Directory to save the CSV output files (default: {OUTPUT_DIR}).")
+                        help="Directory to save the anomaly CSV output files.")
     parser.add_argument("-t", "--interval", type=int, default=int(EXPORT_INTERVAL/60),
-                        help=f"Interval in minutes between CSV exports (default: {int(EXPORT_INTERVAL/60)}).")
-    parser.add_argument("-v", "--verbose", action="store_true",
-                        help="Enable verbose output (prints all anomalies in real-time)")
-    parser.add_argument("-f", "--filter",
-                        help="Custom BPF filter to apply (overrides platform-specific defaults)")
+                        help="Interval in minutes between CSV exports.")
+    parser.add_argument("-f", "--filter", default="", # Default to empty string filter
+                        help="Custom BPF filter (e.g., 'tcp port 80'). Overrides platform defaults.")
+    parser.add_argument("-v", "--verbose", action="store_true", # Currently unused, add logic if needed
+                        help="Enable verbose output during operation.")
 
     args = parser.parse_args()
 
-    # Determine the operating system for platform-specific behaviors
-    system = platform.system()
-    print(f"Detected operating system: {system}")
+    # --- Initialization ---
+    print(f"Detected operating system: {platform.system()}")
+    OUTPUT_DIR = Path(args.output_dir) # Use Path object for directory
+    EXPORT_INTERVAL = args.interval * 60
+    if EXPORT_INTERVAL <= 0:
+         print("Warning: Export interval must be positive. Using default (10 minutes).", file=sys.stderr)
+         EXPORT_INTERVAL = 600
 
-    # Update global settings based on arguments
-    OUTPUT_DIR = args.output_dir
-    EXPORT_INTERVAL = args.interval * 60  # Convert minutes to seconds
+    try:
+        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        print(f"Output directory: {OUTPUT_DIR.resolve()}")
+    except Exception as e:
+        print(f"Error creating output directory '{OUTPUT_DIR}': {e}", file=sys.stderr)
+        sys.exit(1)
 
-    # Create output directory if it doesn't exist
-    if not os.path.exists(OUTPUT_DIR):
-        try:
-            os.makedirs(OUTPUT_DIR)
-            print(f"Created output directory: {OUTPUT_DIR}")
-        except Exception as e:
-            print(f"Error creating output directory: {e}", file=sys.stderr)
-            sys.exit(1)
-
-    # Set up signal handlers for graceful shutdown
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
     print(f"""
-====================================
-=     NETWORK ANOMALY DETECTOR     =
-====================================
+=======================================
+= CONTINUOUS NETWORK ANOMALY DETECTOR =
+=======================================
 """)
-    print(f"CSV files will be saved to: {OUTPUT_DIR}")
+    print(f"Anomaly CSVs will be saved to: {OUTPUT_DIR}")
     print(f"Export interval: {args.interval} minutes")
     print(f"Sniffing on interface: {args.iface}")
 
-    # Check if the baseline files exist
-    oui_baseline_path = args.oui_baseline
-    protocol_baseline_path = args.protocol_baseline
+    # --- Load Baselines ---
+    # Load Anomaly Baselines
+    oui_loaded = load_baseline(args.oui_baseline, 'known_ouis')
+    protocol_loaded = load_baseline(args.protocol_baseline, 'allowed_protocols')
 
-    if not os.path.exists(oui_baseline_path):
-        print(f"Error: OUI baseline file not found at {oui_baseline_path}", file=sys.stderr)
-        print(f"Make sure you've run the baseline creation scripts in the baseline directory.", file=sys.stderr)
-        sys.exit(1)
+    # Load Comprehensive OUI Lookup File
+    comp_oui_loaded = False
+    comp_oui_path = Path(args.comprehensive_baseline)
+    print(f"Loading COMPREHENSIVE OUI lookup: {comp_oui_path}...")
+    if comp_oui_path.exists():
+        try:
+            with open(comp_oui_path, 'rb') as f:
+                loaded_data = pickle.load(f)
+            if isinstance(loaded_data, dict):
+                COMPREHENSIVE_OUI_LOOKUP = loaded_data
+                print(f" - Loaded {len(COMPREHENSIVE_OUI_LOOKUP)} COMPREHENSIVE OUI entries.")
+                comp_oui_loaded = True
+            else:
+                print(f"Error: Comprehensive OUI file '{comp_oui_path}' did not contain a dictionary.", file=sys.stderr)
+        except pickle.UnpicklingError:
+             print(f"Error: Could not unpickle comprehensive OUI file '{comp_oui_path}'.", file=sys.stderr)
+        except Exception as e:
+             print(f"Error loading comprehensive OUI file '{comp_oui_path}': {e}", file=sys.stderr)
+    else:
+        print(f"Warning: Comprehensive OUI file '{comp_oui_path}' not found.", file=sys.stderr)
 
-    if not os.path.exists(protocol_baseline_path):
-        print(f"Error: Protocol baseline file not found at {protocol_baseline_path}", file=sys.stderr)
-        print(f"Make sure you've run the baseline creation scripts in the baseline directory.", file=sys.stderr)
-        sys.exit(1)
+    if not comp_oui_loaded:
+         print("Warning: Comprehensive OUI lookup failed. Manufacturer names will be 'UNKNOWN'.", file=sys.stderr)
+         # Continue running, but MFG names won't work.
 
-    # Load both baselines
-    oui_loaded = load_baseline(oui_baseline_path, 'known_ouis')
-    protocol_loaded = load_baseline(protocol_baseline_path, 'allowed_protocols')
-
-    # Exit if mandatory baselines failed to load
+    # Check if critical anomaly baselines failed (optional stricter check)
     if not oui_loaded or not protocol_loaded:
-         print("\nCritical baseline loading failed. Exiting.", file=sys.stderr)
+         print("\nWarning: Anomaly baseline loading failed or incomplete. Detection may be unreliable.", file=sys.stderr)
          sys.exit(1)
-    elif not BASELINE_DATA['known_ouis'] and not BASELINE_DATA['allowed_protocols']:
-         print("\nWarning: Both OUI and Protocol baselines are empty. Detector may not be effective.", file=sys.stderr)
-         # Continue running, but user should be aware.
 
-    # Initialize the last export time
-    LAST_EXPORT_TIME = time.time()
 
-    # Determine which packet filter to use (platform-specific or user-provided)
-    packet_filter = args.filter if args.filter else get_platform_specific_filter()
+    # --- Start Capture ---
+    LAST_EXPORT_TIME = time.time() # Initialize export timer
+    packet_filter = args.filter # Use user filter directly, empty if not provided
+
     if packet_filter:
         print(f"Using packet filter: '{packet_filter}'")
     else:
-        print("No packet filter applied - capturing all packets")
+        print("No specific packet filter applied (capturing common layers).")
 
     print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Starting continuous packet capture...")
-    print("Press Ctrl+C to stop the detector and save final results.")
+    print("Press Ctrl+C to stop.")
+
+    last_status_time = time.time()
+    status_interval = 300 # Print status every 5 minutes
 
     try:
-        # Start continuous sniffing - note the store=0 which is important for memory efficiency in 24/7 operation
         while RUNNING:
-            try:
-                # Capture packets in smaller batches to allow for periodic CSV exports
-                # Use filter only if one is specified (to avoid filter errors on some platforms)
-                if packet_filter:
-                    sniff(iface=args.iface, filter=packet_filter, prn=process_packet_combined_check,
-                          count=1000, store=0, timeout=60)
-                else:
-                    sniff(iface=args.iface, prn=process_packet_combined_check,
-                          count=1000, store=0, timeout=60)
+            current_time = time.time()
+            # --- Periodic Actions ---
+            # 1. Check for export interval
+            check_and_export_csv() # Checks time and CONNECTION_STATS
 
-                # Check if we should export even if we didn't hit any anomalies during sniffing
-                if time.time() - LAST_EXPORT_TIME >= EXPORT_INTERVAL and CONNECTION_STATS:
-                    check_and_export_csv()
+            # 2. Print status update
+            if current_time - last_status_time >= status_interval:
+                print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Monitoring... ({len(CONNECTION_STATS)} anomalies queued for next export)")
+                last_status_time = current_time
 
-            except Exception as e:
-                print(f"Error during packet capture: {e}", file=sys.stderr)
-                # Don't exit, try to continue capturing after a short delay
-                time.sleep(5)
+            # --- Sniffing ---
+            # Sniff for a short duration to allow periodic checks to run
+            # Reduce count/timeout further if needed for faster response to Ctrl+C
+            sniff(iface=args.iface,
+                  filter=packet_filter,
+                  prn=process_packet_combined_check,
+                  store=0, # Don't store packets in memory
+                  timeout=10, # Sniff for 10 seconds
+                  count=0) # Capture indefinitely within the timeout
+                  # stop_filter=lambda x: not RUNNING) # Optional: check RUNNING more often
 
-        # Final export when shutting down
-        if CONNECTION_STATS:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            output_file = os.path.join(OUTPUT_DIR, f"anomalies_final_{timestamp}.csv")
-            write_anomalies_to_csv(output_file)
-            print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Final export completed to {output_file}")
+            # Add a tiny sleep to prevent high CPU usage in case sniff returns immediately
+            # time.sleep(0.01)
 
+
+    except PermissionError:
+        print(f"\n[!] Permission Error: Failed to capture on {args.iface}.", file=sys.stderr)
+        print( "   Please run the script with sufficient privileges (e.g., using 'sudo').")
+        sys.exit(1)
+    except OSError as e:
+        # Catch specific OSError for interface issues
+        print(f"\n[!] Network Interface Error: {e}", file=sys.stderr)
+        print(f"    Could not capture on interface '{args.iface}'. Check name, status, and privileges.")
+        sys.exit(1)
     except KeyboardInterrupt:
-        print("\nDetector stopped by user.")
+        # Should be caught by signal handler, but as a fallback
+        print("\nKeyboardInterrupt detected.")
+        if RUNNING: # If signal handler didn't run first
+            signal_handler(signal.SIGINT, None) # Manually trigger shutdown logic
     except Exception as e:
-        print(f"\nAn unexpected error occurred: {e}", file=sys.stderr)
+        print(f"\n[!] An unexpected error occurred in the main loop: {e}", file=sys.stderr)
     finally:
-        print("\nDetector shutdown complete.")
+        # --- Final Export on Shutdown ---
+        print("\nInitiating shutdown...")
+        # Force one last check/export cycle using the flag
+        FORCE_EXPORT = True
+        check_and_export_csv()
+        print("Detector shutdown complete.")
 
 if __name__ == "__main__":
-    main()
+    # Optional privilege check (basic)
+    if '-i' in sys.argv or '--iface' in sys.argv:
+        try:
+            is_admin = (os.geteuid() == 0) if hasattr(os, 'geteuid') else (ctypes.windll.shell32.IsUserAnAdmin() != 0)
+            if not is_admin:
+                print("Warning: Live capture usually requires root/administrator privileges.", file=sys.stderr)
+        except NameError: # Handle case where ctypes is not available/imported
+            try: # Check geteuid again just in case
+                 if hasattr(os, 'geteuid') and os.geteuid() != 0:
+                     print("Warning: Live capture usually requires root/administrator privileges.", file=sys.stderr)
+            except AttributeError: # If geteuid also doesn't exist
+                 print("Warning: Could not determine privilege level. Live capture might require root/admin rights.", file=sys.stderr)
+        except Exception as e: # Catch other potential errors during check
+             print(f"Warning: Could not check privilege level ({e}). Live capture might require root/admin rights.", file=sys.stderr)
+             # Import ctypes only needed for Windows check, place import inside try block if desired
+             import ctypes
 
-# --- How to run ---
-# 1. Make sure baseline files are created:
-#    cd ../baseline
-#    python create_oui_baseline.py
-#    python create_protocol_baseline.py
-#
-# 2. Run the cross-platform detector (might need admin privileges):
-#
-#    # On Linux:
-#    sudo python cross_platform_anomaly_detector.py -i eth0
-#
-#    # On macOS:
-#    sudo python cross_platform_anomaly_detector.py -i en0
-#
-#    # On Windows (run cmd as administrator):
-#    python cross_platform_anomaly_detector.py -i Ethernet
-#
-# 3. To change the export interval (e.g., to 5 minutes):
-#    sudo python cross_platform_anomaly_detector.py -i en0 -t 5
-#
-# 4. To specify a different output directory:
-#    sudo python cross_platform_anomaly_detector.py -i en0 -o /path/to/log/directory
-#
-# 5. To use a custom packet filter (advanced users):
-#    sudo python cross_platform_anomaly_detector.py -i en0 -f "ip or ip6"
+
+    main()
