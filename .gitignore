@@ -2,7 +2,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
-.DS_Store
 # Sensitive Data
 #data/processed/*
 #data/raw/connections.*
@@ -170,3 +169,4 @@ cython_debug/
 #.idea/
 
 /AnomaLLMy-venv
+/analyzer/.DS_Store
