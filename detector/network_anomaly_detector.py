@@ -597,3 +597,28 @@ if __name__ == "__main__":
 
 
     main()
+    # --- How to run ---
+    # 1. Make sure baseline files are created:
+    #    cd ../baseline
+    #    python create_oui_baseline.py
+    #    python create_protocol_baseline.py
+    #
+    # 2. Run the network anomaly detector (will need admin privileges):
+    #
+    #    # On Linux:
+    #    sudo python3 network_anomaly_detector.py -i eth0
+    #
+    #    # On macOS:
+    #    sudo python network_anomaly_detector.py -i en0
+    #
+    #    # On Windows (run cmd as administrator):
+    #    python network_anomaly_detector.py -i Ethernet
+    #
+    # 3. To change the export interval (e.g., to 5 minutes):
+    #    sudo python3 network_anomaly_detector.py -i en0 -t 5
+    #
+    # 4. To specify a different output directory:
+    #    sudo python3 network_anomaly_detector.py -i en0 -o /path/to/log/directory
+    #
+    # 5. To use a custom packet filter (advanced users):
+    #    sudo python3 network_anomaly_detector.py -i en0 -f "ip or ip6"
