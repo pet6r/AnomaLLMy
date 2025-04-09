@@ -170,3 +170,4 @@ cython_debug/
 
 /AnomaLLMy-venv
 /analyzer/.DS_Store
+.DS_Store
