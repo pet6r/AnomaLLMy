@@ -1,0 +1,143 @@
+
+===========================================================
+ANOMALY ANALYSIS RESULTS
+===========================================================
+Source File: anomalies_20250409_145806.csv
+Model Used: dolphin-llama3:8b
+Analysis Date: 2025-04-09 16:08:44
+===========================================================
+
+
+ANALYSIS METRICS:
+===============================
+1. Performance Metrics:
+   - Total Elapsed Time: 37.81 seconds
+   - Average Response Rate: 19.60 words/second
+
+2. Content Metrics:
+   - Total Word Count: 739
+   - Total Character Count: 4905
+   - Total Sentence Count: 84
+   - Average Word Length: 6.64 characters
+   - Average Sentence Length: 8.80 words
+   - Average Vocabulary Richness: 0.6172
+
+3. Content Analysis:
+   - Top 5 Most Common Words: connection (14), device (9), port (9), 1 (9), destination (9)
+===============================
+
+
+===== Connection Group 1 Analysis =====
+Anomalous Connection Group:
+
+1. Device Identification:
+   - Device 1:
+     * MAC Address: c2:30:6b:75:12:d8
+     * Manufacturer: Unknown
+
+   - Device 2:
+     * MAC Address: f0:09:0d:4d:83:00
+     * Manufacturer: TP-Link Systems Inc
+
+2. Communication Details:
+   - Protocol: TCP
+   - Source IP: 192.168.68.68
+   - Outgoing Port (Source Port): EPH 443
+   - Destination IP: 192.108.254.114
+   - Incoming Port (Destination Port): EPH 443
+
+3. Traffic Volume:
+   - Packet Count (CNT): 8.0
+
+4. Risk Assessment:
+   - Risk Level: Medium
+   * Reasoning: The unknown device is communicating with a TP-Link device over TCP, which may indicate unauthorized access or potential network vulnerability.
+
+5. Recommendations:
+   - Action: Investigate and monitor the unknown device for any further suspicious activity.
+
+
+===== Connection Group 2 Analysis =====
+Anomalous Connection Group:
+1. Protocol: TCP
+   - Source MAC Address: f0:09:0d:4d:83:00
+   - Source Manufacturer (MFG): TP-Link Systems Inc
+   - Source IP Address: 35.186.224.46
+   - Source Port: 443
+   - Destination MAC Address: c2:30:6b:75:12:d8
+   - Destination Manufacturer (MFG): UNKNOWN
+   - Destination IP Address: 192.168.68.68
+   - Destination Port: EPH (Ephemeral, >1024)
+   - Packet Count (CNT): 4.0
+
+2. Protocol: TCP
+   - Source MAC Address: f0:09:0d:4d:83:00
+   - Source Manufacturer (MFG): TP-Link Systems Inc
+   - Source IP Address: 35.186.224.46
+   - Source Port: 443
+   - Destination MAC Address: c2:30:6b:75:12:d8
+   - Destination Manufacturer (MFG): UNKNOWN
+   - Destination IP Address: 192.168.68.68
+   - Destination Port: EPH (Ephemeral, >1024)
+   - Packet Count (CNT): 2.0
+
+Risk Assessment:
+These anomalous connections pose a Medium risk level due to the unknown destination manufacturer and the use of an ephemeral port (EPH) for communication. The repeated instances of this connection group also indicate potential suspicious activity.
+
+Recommendations:
+1. Investigate further to identify the purpose of these TCP connections and determine if they are legitimate or malicious.
+2. Monitor these connections to gather more information and track any future occurrences.
+3. If the risk level is deemed higher, consider blocking these connections at the firewall level until a conclusive determination has been made.
+
+===== Connection Group 3 Analysis =====
+Device Identification:
+The devices involved in this anomalous connection group are:
+
+1. Device A - MAC address: c2:30:6b:75:12:d8, Manufacturer: UNKNOWN
+
+Communication Details:
+- Protocol: UDP
+- IP addresses: SRCIP = 192.168.68.68, DSTIP = 68.105.28.15
+- Ports (source and destination): SRCPORT = EPH (ephemeral port), DSTPORT = 53
+
+Traffic Volume:
+The connection has a packet count (CNT) of 1.0.
+
+Risk Assessment:
+Based on the presence of an unknown device, use of UDP protocol, and communication with an external IP address, I would classify this connection as *Medium Risk*. The traffic volume is low, but the combination of these factors suggests that further investigation may be warranted to ensure no unauthorized access or malicious activity is occurring.
+
+Recommendations:
+I recommend monitoring this connection for a period of time to gather more information and potentially block it if suspicious activity is detected. Further investigation should include reviewing security logs, analyzing network traffic patterns, and possibly conducting a thorough scan of the internal network to identify any potential vulnerabilities or compromised devices that may be involved in this communication.
+
+
+===== Connection Group 4 Analysis =====
+Anomaly Analysis:
+
+Device Identification:
+The devices involved in these connections are identified as TP-Link Systems Inc, based on their MAC addresses.
+
+Communication Details:
+All of the anomalous connections used the UDP protocol over IP. The source IP address is 68.105.28.15, and the destination IP address is 192.168.68.68. The source port (SRCPORT) is 53 for all connections, while the destination port (DSTPORT) varies between EPH and several other ephemeral ports.
+
+Traffic Volume:
+The CNT field represents packet counts for each connection. The values are as follows:
+
+- Connection 1: 1.0 packets
+- Connection 2: 1.0 packets
+- Connection 3: 33950.0 packets
+- Connection 4: 1.0 packets
+- Connection 5: 1.0 packets
+- Connection 6: 1.0 packets
+- Connection 7: 17848.0 packets
+- Connection 8: 46726.0 packets
+- Connection 9: 10233.0 packets
+
+Risk Assessment:
+Based on the protocols and communication patterns, these anomalous connections pose a Medium risk level.
+
+Recommendations:
+1. Block further communication from IP address 68.105.28.15 to destination IP address 192.168.68.68, specifically on UDP port 53.
+2. Monitor the network for any changes in traffic volume or new anomalous connections originating from the same devices and using the same protocols.
+3. Investigate the purpose of the various destination ports used in these connections to determine if they are legitimate or indicate malicious activity.
+
+Generated by Dolphin, a helpful AI assistant.
