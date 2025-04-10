@@ -5,7 +5,7 @@ AnomaLLMy utilizes the power of Local Large Language Models (LLMs) via Ollama to
 ### Core Workflow:
 
 1.  **Baseline Creation:** Define your business network's known devices (by OUI - e.g., printers, servers, employee laptops, routers) and allowed network protocols (e.g., TCP, UDP, DNS, HTTPS). Generate baseline pickle files.
-2.  **Detection:** Run the detector script to capture live network traffic (or process PCAP files). It compares traffic against your baseline and logs anomalous connections (those involving unknown devices or disallowed protocols) to timestamped CSV files.
+2.  **Detection:** Run the detector script to capture live network traffic. It compares traffic against your baseline and logs anomalous connections (those involving unknown devices or disallowed protocols) to timestamped CSV files.
 3.  **LLM Analysis:** Run the analyzer script. It reads the anomalous connection CSVs, groups related conversations, queries your local Ollama LLM for detailed analysis (device identification, risk assessment, recommendations) for each group, and saves the detailed text output.
 4.  **Report Generation:** Run the report generator script to parse the LLM's text output and create formatted `.docx` reports summarizing the findings for each anomaly log file.
 5.  **(Optional) Metrics & Token Analysis:** Use the provided Jupyter notebooks to visualize LLM performance metrics and estimate token input usage.
