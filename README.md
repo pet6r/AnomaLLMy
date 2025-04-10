@@ -2,7 +2,7 @@
 
 AnomaLLMy utilizes the power of Local Large Language Models (LLMs) via Ollama to enhance network security monitoring for **SMB environments**. It automates the detection of anomalous network connections based on your business's specific baselines and harnesses LLMs to provide contextual analysis and generate actionable reports for IT administrators.
 
-**Core Workflow:**
+### Core Workflow:
 
 1.  **Baseline Creation:** Define your business network's known devices (by OUI - e.g., printers, servers, employee laptops, routers) and allowed network protocols (e.g., TCP, UDP, DNS, HTTPS). Generate baseline pickle files.
 2.  **Detection:** Run the detector script to capture live network traffic (or process PCAP files). It compares traffic against your baseline and logs anomalous connections (those involving unknown devices or disallowed protocols) to timestamped CSV files.
@@ -112,7 +112,7 @@ These define what is considered "normal" for your specific business network.
 
 1. **Comprehensive OUI Lookup - Run Once/Occasionally**:
 - Download a manuf file from Wireshark (https://www.wireshark.org/download/automated/data/). This helps identify unknown devices later.
-- Navigate to the `baseline/` directory: cd baseline
+- Navigate to the `baseline/` directory: `cd baseline`
 - Run the script to create the large lookup pickle:
 
 ```bash
@@ -135,7 +135,7 @@ python create_protocol_baseline.py -o ./pickle_files/protocol_baseline.pkl
 This script captures traffic and generates anomaly CSVs based on your baseline.
 
 1. Navigate to the `detector/` directory with following command: `cd detector`
-2. Run the script. Requires Administrator/sudo privileges for live capture. Choose the network interface connected to your main business network segment.
+2. Run the script. **This will require Administrator/sudo privileges for live capture**. Choose the network interface connected to your main business network segment.
 
 ```bash
 # Ensure your python environment is still active
@@ -152,12 +152,12 @@ python3 continuous_network_anomaly_detector.py -i Ethernet -t 10 -o ./anomaly_lo
 - -o <directory>: Specifies where to save the output CSV files (default: ./anomaly_logs/).
 - Uses baseline files from ../baseline/pickle_files/ by default. Use -ob, -pb, -cb to override paths if needed.
 
-3. Let it run to capture anomalies. Press Ctrl+C to stop gracefully. CSV files will appear in anomaly_logs/.
+3. Let it run to capture anomalies. **Press Ctrl+C to stop gracefully**. CSV files will appear in anomaly_logs/.
 4. Navigate back to the project root: `cd ..`
 
 ### Step 3: Run the LLM Analyzer
 This script processes the anomaly CSVs and generates detailed text analyses using your local Ollama LLM.
-1. Navigate to the analyzer/ directory: cd analyzer
+1. Navigate to the analyzer/ directory: `cd analyzer`
 2. Ensure your Ollama service is running with the desired model downloaded.
 3. Run the analyzer script:
 
@@ -218,7 +218,7 @@ jupyter lab
 jupyter notebook
 ```
 
-3. Open and run the cells in TokenCounter.ipynb (estimates LLM input size) or Metric_Analysis.ipynb (visualizes LLM performance from analysis files). Adjust paths inside the notebooks if necessary.
+3. Open and run the cells in TokenCounter.ipynb (estimates LLM token input size) or Metric_Analysis.ipynb (visualizes LLM performance from analysis files). Adjust paths inside the notebooks if necessary.
 
 ## Customization
 - **Baselines**: The effectiveness depends heavily on accurate `oui_baseline.pkl` and `protocol_baseline.pkl`. Regularly update these based on your known network assets (new employee laptops, printers, servers, IoT devices) and allowed traffic policies.
