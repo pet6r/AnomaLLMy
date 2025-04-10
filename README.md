@@ -218,7 +218,7 @@ jupyter lab
 jupyter notebook
 ```
 
-3. Open and run the cells in TokenCounter.ipynb (estimates LLM token input size) or Metric_Analysis.ipynb (visualizes LLM performance from analysis files). Adjust paths inside the notebooks if necessary.
+3. Open and run the cells in TokenCounter.ipynb (estimates LLM token input size) or MetricAnalysis.ipynb (visualizes LLM performance from analysis files). Adjust paths inside the notebooks if necessary.
 
 ## Customization
 - **Baselines**: The effectiveness depends heavily on accurate `oui_baseline.pkl` and `protocol_baseline.pkl`. Regularly update these based on your known network assets (new employee laptops, printers, servers, IoT devices) and allowed traffic policies.
