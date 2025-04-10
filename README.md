@@ -1,4 +1,4 @@
-# AnomaLLMy: LLM-Powered Network Anomaly Detection & Analysis for Small and Medium-sized Businesses
+# AnomaLLMy: LLM-Powered Network Anomaly Detection & Analysis for Small and Medium-Sized Businesses
 
 AnomaLLMy utilizes the power of Local Large Language Models (LLMs) via Ollama to enhance network security monitoring for **SMB environments**. It automates the detection of anomalous network connections based on your business's specific baselines and harnesses LLMs to provide contextual analysis and generate actionable reports for IT administrators.
 
