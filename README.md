@@ -111,7 +111,7 @@ Execute the following steps in order. Remember to keep your virtual environment 
 These define what is considered "normal" for your specific business network.
 
 1. **Comprehensive OUI Lookup - Run Once/Occasionally**:
-- Download a manuf file from Wireshark (https://www.wireshark.org/download/automated/data/). This helps identify unknown devices later.
+- Download the manuf file from Wireshark (https://www.wireshark.org/download/automated/data/). This helps identify unknown devices later.
 - Navigate to the `baseline/` directory: `cd baseline`
 - Run the script to create the large lookup pickle:
 
