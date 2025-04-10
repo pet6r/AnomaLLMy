@@ -1,0 +1,287 @@
+
+===========================================================
+ANOMALY ANALYSIS RESULTS
+===========================================================
+Source File: anomalies_mock_connections.csv
+Model Used: hf.co/AlicanKiraz0/SenecaLLM_x_Qwen2.5-7B-CyberSecurity-Q4_K_M-GGUF:latest
+Analysis Date: 2025-04-09 17:56:58
+===========================================================
+
+
+ANALYSIS METRICS:
+===============================
+1. Performance Metrics:
+   - Total Elapsed Time: 89.77 seconds
+   - Average Response Rate: 21.58 words/second
+
+2. Content Metrics:
+   - Total Word Count: 1923
+   - Total Character Count: 13305
+   - Total Sentence Count: 193
+   - Average Word Length: 6.92 characters
+   - Average Sentence Length: 9.96 words
+   - Average Vocabulary Richness: 0.5176
+
+3. Content Analysis:
+   - Top 5 Most Common Words: destination (28), 1 (25), unknown (20), source (20), 0 (20)
+===============================
+
+
+===== Connection Group 1 Analysis =====
+### Device Identification
+
+- **Source MAC:** `a0:d3:c1:aa:bb:cc`
+  - Manufacturer (MFG): Apple, Inc.
+  - IP Address: `192.168.1.150`
+
+- **Destination MAC:** `de:ad:be:ef:00:01`
+  - Manufacturer (MFG): UNKNOWN (Not in the baseline)
+  - IP Address: `104.20.15.1`
+
+### Communication Details
+
+- **Protocol:** TCP
+- **Source and Destination Ports:**
+  - From Source to Destination:
+    - Outbound: Ephemeral Port (`EPH`) → Incoming: 443 (HTTPS)
+    - Outbound: 80 → Incoming: Ephemeral Port (`EPH`)
+  - From Destination to Source:
+    - Outbound: Ephemeral Port (`EPH`) → Incoming: 443
+    - Outbound: 80 → Incoming: Ephemeral Port (`EPH`)
+
+### Traffic Volume
+
+- **Source to Destination (a0:d3:c1:aa:bb:cc → de:ad:be:ef:00:01):**
+  - Port `443`: `112.0` packets
+  - Port `80`: `3.0` packets
+
+- **Destination to Source (de:ad:be:ef:00:01 → a0:d3:c1:aa:bb:cc):**
+  - Port `443`: `98.0` packets
+  - Port `80`: `1.0` packet
+
+### Risk Assessment
+
+The anomalous connection between Apple's device and the UNKNOWN MAC address indicates that multiple protocols (TCP on ports 443 and 80) are being used for communication, with an unknown destination device involved. These operations typically involve secure communications on port 443 (HTTPS) but also a standard web server protocol on port 80. The volume of packets and the ephemeral nature of one endpoint suggest that the UNKNOWN device might be attempting a data exfiltration or internal network probing.
+
+**Risk Level:** Medium
+
+### Recommendations
+
+1. **Investigate the UNKNOWN MAC Address:**
+   - Contact the IT team to locate the identity and purpose of the unknown MAC address (`de:ad:be:ef:00:01`) on the enterprise network.
+   - Determine if it is a legitimate device that should be allowed or if it is unauthorized.
+
+2. **Monitor HTTPS Traffic:**
+   - Monitor all outgoing connections on port 443 from `a0:d3:c1:aa:bb:cc` and ensure that no sensitive data is being exfiltrated.
+   - Establish baselines for the expected traffic volume to identify any suspicious patterns.
+
+3. **Update Baseline:**
+   - If the UNKNOWN device turns out to be legitimate, add it to the enterprise’s ICS or network baseline to prevent false positives in future connection checks.
+
+4. **Block Ephemeral Ports:**
+   - Consider blocking ephemeral ports (ports > 1024) on the source device to minimize potential risks from unknown devices sending requests or receiving responses on these ports.
+
+By following these recommendations, the security team can ensure that any anomalous connections are promptly investigated and addressed, thereby reducing the risk of unauthorized data access or malicious activity within the network.
+
+===== Connection Group 2 Analysis =====
+### Anomalous Connection Group Analysis
+
+#### Device Identification
+- **Source (SRC)**:
+  - **Device MAC**: f8:75:a4:dd:ee:ff
+  - **Manufacturer**: Dell Inc.
+  - **IP Address**: 192.168.1.55
+- **Destination (DST)**:
+  - **Device MAC**: UNKNOWN
+  - **Manufacturer**: Unknown
+  - **IP Address**: 192.168.1.20
+
+#### Communication Details
+- **Protocol**: UDP
+- **Source IP:Port**:
+  - **EPH Port (54321)**, which could be ephemeral.
+- **Destination IP:Port**:
+  - **EPH Port (12345)**, also an ephemeral port.
+
+#### Traffic Volume
+- **Source to Destination**: CNT = 2.0 packets
+- **Destination to Source**: CNT = 5.0 packets
+
+#### Risk Assessment
+- **Protocol**: UDP is less secure than TCP because it does not provide error-checking and flow control.
+- **Ephemeral Ports**: Both ports are dynamically allocated, suggesting possible malicious software or non-standard protocols being used for communication.
+- **Unknown Device**: The destination device (MAC: UNKNOWN) implies the connection might be to a newly added unverified machine.
+- **Low** Risk Level: The low risk is due to limited exposure and ephemeral nature of the ports.
+
+#### Recommendations
+- **Monitor**: Continue monitoring the traffic to observe any unusual patterns or additional connections over time.
+- **Block**: Implement blocking rules for the EPH ports if such a protocol is not required for normal operations.
+- **Investigate**: Research the “UNKNOWN” MAC address and source network segment. If it’s an external IP, check if there are legitimate services listening on those ports.
+
+---
+
+This detailed analysis of the anomalous connections will help security personnel take appropriate actions to secure the network against potential threats.
+
+===== Connection Group 3 Analysis =====
+## Anomalous Connection Group Analysis
+
+### Device Identification:
+1. **Source Devices:**
+   - **SRCMAC:** b8:27:eb:11:22:33 
+   - **SRCMFG:** Raspberry Pi Foundation
+   - **SRCIP:** 192.168.1.30
+
+   - **SRCMAC:** c2:30:6b:44:55:66 
+   - **SRCMFG:** Hangzhou H3C Technologies Co., Limited
+   - **SRCIP:** 192.168.1.88
+
+2. **Destination Devices:**
+   - **DSTMAC:** N/A (multicast)
+   - **DSTMFG:** MULTICAST
+   - **DSTIP:** 224.0.0.251 (a multicast IP for DNS-SD)
+
+### Communication Details:
+- Both source devices are communicating with the same destination IP address, 224.0.0.251.
+- The communication protocol used is UDP on port 5353.
+- The outgoing ports from the Raspberry Pi Foundation and Hangzhou H3C Technologies Co., Limited devices both use ephemeral (ephemeral) ports, likely for dynamic connection management.
+
+### Traffic Volume:
+- **Raspberry Pi Foundation:** CNT = 15.0 packets
+- **Hangzhou H3C Technologies Co., Limited:** CNT = 8.0 packets
+
+### Risk Assessment:
+These anomalous connections appear to be utilizing UDP port 5353, which is commonly associated with DNS Service Discovery (mDNS). The presence of multiple devices (one from Raspberry Pi and one from H3C) communicating with a multicast IP suggests this might be traffic for local network discovery or advertising. However, the OUIs (b8:27:eb and c2:30:6b) are not in our baseline, indicating these devices are outside of our usual environment, raising concern.
+
+### Recommendations:
+- **Monitor:** The connection looks standard from a networking standpoint but involves an unknown device with an OUI that does not match any previously seen ICS or enterprise network device. Monitor this traffic closely for additional anomalies.
+- **Update Baseline:** Update the OUI and allowed protocol baseline to include these devices if they are legitimate network components.
+- **Check Manufacturer:** Research the Raspberry Pi Foundation and H3C Technologies Co., Limited, as they may have recently been added to your network without proper configuration. Contact them or check for any unauthorized software installations.
+- **Investigate:** Look into why these devices are initiating mDNS traffic on the network. If the devices are new, ensure they follow standard security guidelines before full integration.
+
+**Risk Level: Medium**
+
+===== Connection Group 4 Analysis =====
+### Device Identification:
+- **Source (SRCMAC):** 00:15:17:77:88:99, Manufacturer: Intel Corporate, IP Address: 192.168.1.1.
+- **Destination (DSTMAC):** UNKNOWN, IP Address: 192.168.1.150 (No manufacturer listed in baseline).
+- **Reverse Connection:** Destination MAC is marked as “UNKNOWN,” and its manufacturer is not listed.
+
+### Communication Details:
+- **Protocol Used:** ARP.
+- **Source Ports:** None specified for the ARP protocol.
+- **Destination Ports:** None specified for the ARP protocol.
+- **IP Addresses Involved:** Source: 192.168.1.1, Destination: 192.168.1.150.
+- **Counts (CNT):** Source -> Destination: 2 packets; Destination -> Source: 1 packet.
+
+### Traffic Volume:
+- The total number of ARP packets exchanged is 3 (Source: 2 packets, Destination: 1 packet).
+
+### Risk Assessment:
+- **Risk Level:** Medium
+- **Reasoning:** The use of the ARP protocol between known devices (Intel Corporate and UNKNOWN) involves an undefined destination MAC address, which could indicate a potential rogue or unauthorized device. Additionally, repeated communication suggests that the “UNKNOWN” device might be probing for network activity or attempting to establish connections.
+
+### Recommendations:
+1. **Investigate:** Determine if the “UNKNOWN” IP address is owned by any new or unapproved vendor.
+2. **Monitor:** Continuously monitor all ARP traffic between 192.168.1.1 and 192.168.1.150 for further anomalies.
+3. **Block (if necessary):** If the “UNKNOWN” device is identified as malicious, block it by updating firewall rules to deny traffic from this IP address.
+
+### Additional Notes:
+- The use of ARP outside its normal network layer functions could indicate a replay attack or an attempt to disrupt communication between known devices. Investigate if there is any legitimate reason for this interaction or if it is an unauthorized activity by the “UNKNOWN” device.
+
+===== Connection Group 5 Analysis =====
+## Anomalous Connection Group Analysis
+
+### PROTOCOL            SRCMAC          SRCMFG         SRCIP  SRCPORT            DSTMAC          DSTMFG         DSTIP  DSTPORT  CNT
+    ICMP a0:d3:c1:aa:bb:cc     Apple, Inc. 192.168.1.150      NaN 00:15:17:77:88:99 Intel Corporate   192.168.1.1      NaN  4.0
+    ICMP 00:15:17:77:88:99 Intel Corporate   192.168.1.1      NaN a0:d3:c1:aa:bb:cc     Apple, Inc. 192.168.1.150      NaN  4.0
+
+### Device Identification
+- **Source (SRC):** 
+  - MAC Address: a0:d3:c1:aa:bb:cc; Manufacturer: Apple, Inc.
+  - IP Address: 192.168.1.150
+- **Destination (DST):**
+  - MAC Address: 00:15:17:77:88:99; Manufacturer: Intel Corporate
+  - IP Address: 192.168.1.1
+
+### Communication Details
+- **Protocol:** ICMP (Internet Control Message Protocol)
+- **Source Ports:** Not applicable for ICMP.
+- **Destination Ports:** Not applicable for ICMP.
+- **IP Addresses:**
+  - Source: 192.168.1.150 -> Destination: 192.168.1.1
+
+### Traffic Volume
+- The CNT field indicates that there are 4 packets exchanged in each direction (from the source to destination and back).
+
+### Risk Assessment
+The risk level of these connections can be considered **Low**:
+- ICMP is typically used for basic network diagnostics and does not involve high-risk operations, such as data exchange or control actions.
+- The connection involves common household devices (Apple device) and a corporate device (Intel). Both are expected to use ICMP for normal communication activities.
+
+### Recommendations
+1. **Allow:** This connection involves standard diagnostic traffic between typical consumer and enterprise devices using ICMP, which is safe to allow.
+2. **Monitor:** Keep an eye on the flow of ICMP packets between these devices for any unusual spikes or changes in packet counts that might suggest further anomalies.
+3. **Investigate:** No deeper investigation seems necessary given the benign nature of ICMP communication.
+
+### Summary
+This connection involves a typical use case where consumer devices use ICMP for network diagnostics with enterprise equipment, posing no significant risk. Therefore, it is advisable to allow this traffic while keeping an ongoing check for unusual patterns.
+
+===== Connection Group 6 Analysis =====
+## Anomalous Connection Group Analysis
+
+### Device Identification
+
+**SRC Device:**
+- **Manufacturer:** VMware Inc.
+- **MAC Address:** 00:50:56:ab:cd:ef
+- **Type/Role:** Likely a virtual machine (VM) managed by VMware.
+
+**DST Device:**
+- **Manufacturer:** Arista Networks Inc.
+- **MAC Address:** f0:09:0d:12:34:56
+- **Type/Role:** A network device, possibly used for monitoring or automation in an ICS/Enterprise environment.
+
+### Communication Details
+
+#### Source to Destination:
+- **Protocol:** TCP (Transmission Control Protocol)
+- **Source IP:** 10.0.0.5
+- **Source Port:** EPH (ephemeral port > 1024, likely used by the VM to communicate with external services).
+- **Destination IP:** 10.0.0.10
+- **Destination Port:** 9999
+
+#### Destination to Source:
+- **Protocol:** TCP
+- **Source IP:** 10.0.0.10
+- **Source Port:** 9999
+- **Destination IP:** 10.0.0.5
+- **Destination Port:** EPH (ephemeral port > 1024, likely used to forward back to the VM).
+
+### Traffic Volume
+
+**Packet Counts:**
+- From Source to Destination: CNT = 25.0 packets.
+- From Destination to Source: CNT = 18.0 packets.
+
+### Risk Assessment
+
+Both endpoints are using protocols (TCP) and ephemeral ports, which are often associated with internal or monitoring services rather than traditional ICS/Enterprise systems. The presence of an unknown device (VMware) communicating directly with another unknown device (Arista Networks Inc.) raises suspicion as both parties could be involved in unauthorized data exchange. Moreover, using ephemeral ports for communication might suggest that the traffic is not being monitored by standard firewalls or security tools.
+
+**Risk Level:** Medium
+
+### Recommendations
+
+1. **Investigate the Devices:**
+   - Research the VMware and Arista devices in your environment to confirm if these machines are supposed to communicate with each other.
+   
+2. **Monitor Traffic:**
+   - Set up packet captures on both 10.0.0.5 (the VM) and 10.0.0.10 (the network device) to see the actual data exchanged between them.
+
+3. **Update Baselines:**
+   - If confirmed, include these devices and protocols in the baseline if they are legitimate.
+   - If not, block or deny traffic from these ephemeral ports to 9999.
+
+4. **Security Review:**
+   - Ensure that no unauthorized VMs are active on the network and check for any potential misconfigurations that allow for direct inter-VM communication without proper safeguards.
+
+By following these recommendations, you can better understand the nature of the traffic and take appropriate measures to mitigate risk in your network environment.

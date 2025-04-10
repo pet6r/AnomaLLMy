@@ -1,0 +1,307 @@
+
+===========================================================
+ANOMALY ANALYSIS RESULTS
+===========================================================
+Source File: anomalies_mock_connections.csv
+Model Used: qwen2.5:1.5b
+Analysis Date: 2025-04-09 17:24:35
+===========================================================
+
+
+ANALYSIS METRICS:
+===============================
+1. Performance Metrics:
+   - Total Elapsed Time: 35.03 seconds
+   - Average Response Rate: 63.69 words/second
+
+2. Content Metrics:
+   - Total Word Count: 2182
+   - Total Character Count: 15301
+   - Total Sentence Count: 197
+   - Average Word Length: 7.01 characters
+   - Average Sentence Length: 11.08 words
+   - Average Vocabulary Richness: 0.4713
+
+3. Content Analysis:
+   - Top 5 Most Common Words: source (35), connection (26), mac (23), destination (19), address (19)
+===============================
+
+
+===== Connection Group 1 Analysis =====
+### Anomalous Connection Group Analysis
+
+#### Source File: anomalies_mock_connections.csv
+
+| PROTOCOL | SRCMAC    | SRCMFG         | SRCIP     | SRCPORT           | DSTMAC    | DSTMFG          | DSTIP      | DSTPORT       | CNT |
+|----------|-----------|----------------|-----------|--------------------|------------|-----------------|-------------|----------------|-----|
+| TCP       | a0:d3:c1:aa:bb:cc | Apple, Inc.  | 192.168.1.150 | EPH de:ad:be:ef:00:01 | UNKNOWN   |               | 104.20.15.1 | 443         | 112.0|
+| TCP       | de:ad:be:ef:00:01 | UNKNOWN     | 104.20.15.1    | 443 a0:d3:c1:aa:bb:cc | Apple, Inc.  |               | 192.168.1.150 | EPH        | 98.0       |
+| TCP       | a0:d3:c1:aa:bb:cc | Apple, Inc.  | 192.168.1.150 | EPH de:ad:be:ef:00:01 | UNKNOWN   |               | 104.20.15.1   |     80      | 3.0        |
+| TCP       | de:ad:be:ef:00:01 | UNKNOWN     | 104.20.15.1    | 80 a0:d3:c1:aa:bb:cc | Apple, Inc.  |               | 192.168.1.150 | EPH        | 1.0         |
+
+#### Analysis
+
+**Device Identification:**
+
+- **SRCMAC:** a0:d3:c1:aa:bb:cc (Apple, Inc.)
+- **DSTMFG:** Apple, Inc.
+
+- **SRCMFG:** Apple, Inc.
+- **DSTMAC:** de:ad:be:ef:00:01 (UNKNOWN)
+
+**Communication Details:**
+
+- **PROTOCOL:** TCP
+- **SRCIP & DSTIP:** Both are 192.168.1.150
+- **SRCPORT & DSTPort:** Both Ports are ephemeral (EHPL)
+- **Protocol in SRC Port:** EPH
+- **Protocol in DST Port:** EPH
+
+**Traffic Volume:**
+
+- `Source IP` : 192.168.1.150
+- `Destination IP`: 104.20.15.1 (Note: Both have the same IP address, which is unusual)
+
+**Risk Assessment:**
+
+Based on the protocols and devices involved:
+
+- **Protocol:** The connection uses TCP over HTTP/HTTPS.
+- **Devices:** One device identified as "Apple, Inc." with a specific MAC Address (a0:d3:c1:aa:bb:cc) and another unrecognized entity (de:ad:be:ef:00:01).
+- **Ports:** All connections are using ephemeral ports (EHPL), which suggests potential misconfiguration or unsecured services.
+
+**Risk Level:** 
+- High
+  - Reasoning: The presence of an unknown device with a specific MAC address raises concerns about unauthorized access. The use of TCP and HTTP/HTTPS protocols in the absence of any security controls indicates vulnerabilities. The ephemeral ports increase the risk as they are open to potential attackers.
+  
+**Recommendations:**
+
+- **Block Connection:** Immediate blocking is recommended due to the high risk level identified.
+- **Monitor Device Activity:** Continuously monitor all devices involved and their communications for any changes or further anomalies.
+- **Investigate Devices:** Conduct detailed investigations into both the "Apple, Inc." device and the unknown entity (de:ad:be:ef:00:01) to ensure compliance with security policies.
+
+**Summary of Actions:**
+
+- Block the connection to prevent unauthorized access.
+- Monitor all related devices for any changes or further anomalies.
+- Investigate both identified devices for potential security lapses.
+
+===== Connection Group 2 Analysis =====
+### Anomalous Connection Group Analysis
+
+#### 1. Device Identification:
+- **Source (SRC)**:
+  - **Device ID**: Source MAC address and Manufacturer Name (`f8:75:a4:dd:ee:ff Dell Inc`)
+    - This device is a client with an unknown manufacturer name.
+  
+  - **Destination (DST)**:
+    - **Device ID**: Destination MAC address and Manufacturer Name (`UNKNOWN 192.168.1.20`)
+      - This device has an unknown source MAC address but appears to be part of our network.
+
+#### 2. Communication Details:
+- **Protocols**:
+  - **SRC (Source)**: Uses UDP protocol
+    - Source port: Ephemeral port `EPH` (Port > 1024)
+    - Protocol is `UDP`, which means the communication is over an unencrypted network layer.
+
+  - **DST (Destination)**: Uses a different protocol not in our baseline list.
+    - Destination port: `EPH` (Source's ephemeral port) but for this connection, we see the destination using UDP as well.
+    - Protocol could be considered unknown or possibly another non-standard transport layer protocol.
+
+  - **Protocol Combination**:
+    - Both source and destination ports use different protocols (`UDP`, `UNKNOWN`) indicating that both parties may not have fully established a standard network connection (e.g., they are communicating over unsecured channels).
+
+- **IP Addresses**: 
+  - Source IP: `192.168.1.55`
+  - Destination IP: `192.168.1.20`
+
+- **Ports**:
+  - Source port (SRCPORT): `EPH` (Ephemeral)
+  - Destination port (DSTPORT): `54321` (Destination's ephemeral port, not shown as it uses UDP)
+
+#### 3. Traffic Volume:
+- **CNT (Connection Count)**: 
+  - The connection count for both parties is provided, with the destination showing a lower count (source is higher).
+
+#### 4. Risk Assessment:
+Based on the combination of an unknown manufacturer device (`f8:75:a4:dd:ee:ff Dell Inc`) and the use of non-standard protocols (`UNKNOWN` and `UDP`), we can infer:
+
+- **Risk Level**: High
+  - The anomalous connection involves a client with no known identity, which raises concerns about potential security risks such as man-in-the-middle attacks or unauthorized access.
+  - Additionally, using an unknown MAC address suggests that the source device is not part of our normal network environment, adding another layer of suspicion.
+
+- **Reasons for High Risk**: 
+  - The lack of a manufacturer name makes it difficult to trace and authenticate the origin of this device.
+  - The use of non-standard protocols (`UNKNOWN` and `UDP`) suggests that encryption or secure communication mechanisms may be absent, potentially exposing data to interception.
+
+#### 5. Recommendations:
+- **Block** the connection until further investigation confirms no malicious activity.
+- **Monitor both parties for unusual network behavior**: Keep an eye on any subsequent communications from this source (source port) and destination (destination port).
+- **Perform a security audit of both devices** involved in this anomalous connection to ensure compliance with company standards and policies.
+
+#### Summary:
+This anomaly presents significant risks due to the unknown nature of one party's device and the use of non-standard protocols. Immediate action is necessary to mitigate potential security threats while further investigation confirms the legitimacy of the network environment.
+
+### Recommendations
+1. **Block** this connection until a thorough audit can confirm no malicious activity.
+2. Monitor both parties for any unusual behavior.
+3. Conduct a full security audit on all devices involved in the anomalous connection.
+4. Implement additional security measures such as encryption and secure authentication protocols to prevent future unauthorized access.
+
+---
+
+===== Connection Group 3 Analysis =====
+### Anomalous Connection Group Analysis
+
+#### Device Identification
+- **Device 1:** Raspbian (Source MAC: b8:27:eb:11:22:33, Manufacturer: Raspberry Pi Foundation)
+  - **Connection to Source IP: 192.168.1.30**: Port 5353
+- **Device 2:** HPE Microserver (Source MAC: c2:30:6b:44:55:66, Manufacturer: Hangzhou H3C Technologies Co., Limited)
+  - **Connection to Destination IP: 192.168.1.88**: Port 5353
+
+#### Communication Details
+- **Protocol:** UDP
+- **Source MAC Address:** b8:27:eb:11:22:33 (Raspberry Pi Foundation)
+- **Destination MAC Address:** c2:30:6b:44:55:66 (HPE Microserver)
+- **Source IP:** 192.168.1.30
+- **Source Port:** 5353 (Ephemeral port, UDP used by clients)
+- **Destination MAC Address:** 01:00:5e:00:00:fb (Multicast address for the network group) (224.0.0.251 - IP multicast destination)
+- **Destination Port:** 5353
+- **Packet Count (CNT):** 5
+
+#### Traffic Volume
+- Packet Count (CNT): 5
+
+#### Risk Assessment
+The protocol used (UDP with a source and destination port both being ephemeral) indicates an unknown device attempting to connect on untrusted ports. The high traffic volume suggests this connection is likely for malicious purposes, possibly to probe the network or attempt lateral movement.
+
+**Risk Level:** High - This connection poses significant risks as it involves a non-standard protocol and appears to be a potential breach point.
+
+#### Recommendations
+- **Block Connection**: Due to the unknown source device and unsecured ports used (both source and destination), this connection should be blocked.
+  - Action: Block all connections originating from any unknown IP/MAC addresses on all affected interfaces.
+  
+- **Monitor Source IPs/DOMAINS**: The Raspberry Pi Foundation device is an open port, which poses a risk to the entire network. Monitor all traffic coming from this source for anomalies and potential DDoS activity.
+
+This analysis will be crucial in understanding the nature of these connections and taking appropriate action to mitigate any security risks they pose.
+
+===== Connection Group 4 Analysis =====
+### Anomalous Connection Group Analysis
+
+#### Device Identification:
+- **Source MAC Address (SRCMAC):** `00:15:17:77:88:99`
+  - Manufacturer (MFG): Intel Corporate
+  - IP Address (SRCIP): `192.168.1.1`
+
+- **Destination MAC Address (DSTMAC):** `UNKNOWN`
+  - Manufacturer (MFG): Not specified in our baseline
+  - IP Address (DSTIP): `192.168.1.150`
+  - Port: `NaN`
+  - Protocol: `0x0800`
+
+- **Source MAC Address (SRCMAC):** `12:34:56:78:9a:bc`
+  - Manufacturer (MFG): Unknown
+  - IP Address (SRCIP): `192.168.1.1`
+  - Port: `NaN`
+
+#### Communication Details:
+- Protocol Used: ARP and ICMP
+- Source Ports: [12, 34]
+- Destination MAC Address (DSTMAC): `UNKNOWN`
+- Destination IP Address: `192.168.1.150`
+- Source Ports: `0x0800`
+- Port Used: `NaN`
+
+#### Traffic Volume:
+- **CNT:** `2`
+
+#### Risk Assessment:
+- Since the source MAC address is an unknown device, it could be a rogue client or unauthorized access point.
+- The use of ARP and ICMP indicates potential misconfiguration or man-in-the-middle attacks.
+
+**Risk Level (Critical):**
+- **Reasoning:**
+  - An unknown MAC address suggests that the IP belongs to an external connection rather than a legitimate internal network device.
+  - The fact that the source port is not within our baseline protocols (likely ARP and ICMP) further supports this anomaly, as these are known non-standard or misconfigured protocols.
+
+#### Recommendations:
+- **Action Required:**
+  - Block all connections with unknown MAC addresses from external sources to prevent potential unauthorized access attempts.
+  - Monitor any new devices that have been added to the network for anomalous activity such as ARP and ICMP traffic.
+
+===== Connection Group 5 Analysis =====
+### Anomalous Connection Group Analysis
+
+#### Protocol:
+- ICMP (Internet Control Message Protocol)
+- UDP (User Datagram Protocol)
+
+#### Source MAC Address and Manufacturer:
+- **MAC Address:** a0:d3:c1:aa:bb:cc  
+  - Device Identification: This is the source device.
+  - Communication Details: The connection uses an IP address of `192.168.1.150` for communication purposes, but no specific protocol or port information is provided. The destination MAC address and IP are not detailed in this group.
+
+#### Destination:
+- **MAC Address:** 00:15:17:77:88:99 Intel Corporate  
+  - Device Identification: This appears to be the destination device.
+  - Communication Details: The connection uses an IP address of `192.168.1.1` for communication purposes, but no specific protocol or port information is provided.
+
+#### Traffic Volume:
+- **Connection Count (CNT):** Not Provided
+
+#### Risk Assessment:
+Given that this connection group involves a non-standard source MAC (`a0:d3:c1:aa:bb:cc`) and the destination IP `192.168.1.1` for communication, it raises concerns due to potential misuse or unexpected behavior of devices in the network environment.
+
+#### Risk Assessment:
+- **Low:** The combination of a non-standard MAC address without explicit permission or connection details suggests an unknown device that might pose no immediate threat but could lead to security vulnerabilities if exploited.
+- **Medium:** An IP connection with unexplained origins is concerning and should be monitored for potential unauthorized access attempts, especially given the lack of specific protocol definitions.
+
+#### Recommendations:
+1. **Block/Alert:**
+   - **Action:** Block this connection as an anomaly. Monitor the device with a non-standard MAC address closely.
+2. **Monitor:**
+   - **Action:** Continue monitoring the IP `192.168.1.1` for any unauthorized traffic or unusual activities.
+3. **Investigate:**
+   - **Action:** Investigate further to determine if there are legitimate reasons behind this connection or if it requires deeper investigation into the network’s access control policies.
+
+### Explanation:
+This anomalous group indicates a potential security issue related to a new device's communication behavior without explicit authorization. The lack of protocol details and destination IP address makes it difficult to assess the exact nature of the threat, but the combination suggests an ongoing or unexpected use case for this device within the network.
+
+The risk assessment is set at "Low" due to non-standard MAC addresses and an unexplained origin IP; however, continued monitoring and investigation are recommended to ensure security.
+
+===== Connection Group 6 Analysis =====
+### Anomalous Connection Group
+
+#### Protocol: TCP
+- **Source MAC Address:** `00:50:56:ab:cd:ef` (Manufacturer: VMware)
+- **Destination MAC Address:** `f0:09:0d:12:34:56` (Manufacturer: Arista Networks Inc)
+- **Protocol:** TCP
+- **Source IP and Port:** `10.0.0.5: EPH`
+- **Destination IP and Port:** `10.0.0.10: 9999`
+- **Connection Count (CNT):** `2`
+
+#### Traffic Volume:
+The connection between these devices has occurred twice, which indicates potential interest or communication.
+
+#### Risk Assessment:
+Given that both the source and destination MAC addresses belong to manufacturers not commonly known in our baseline, it is highly unusual for an ARP spoofing attempt. The low port 9999 (ephemeral) implies this could be a legitimate service running on either host. However, because these hosts come from different vendors, there might be some risk of protocol or device-specific exploitation.
+
+**Risk Level: Medium - Potential for non-standard behavior and vendor-specific risks.**
+
+#### Recommendations:
+- **Monitor Traffic:** Increase monitoring on both ports to ensure no unauthorized activity.
+- **Device Verification:** Contact the respective manufacturers to verify the devices' authenticity and check for known vulnerabilities related to these MAC addresses.
+- **Network Audit:** Conduct a deeper audit of these network segments to understand why these connections were made.
+
+#### Protocol Analysis:
+1. **Source** (MAC: `00:50:56:ab:cd:ef`, IP: `10.0.0.5`):
+   - The device has been seen previously in our baseline, which is normal.
+2. **Destination** (MAC: `f0:09:0d:12:34:56`, IP: `10.0.0.10`):
+   - This MAC address belongs to Arista Networks Inc, a well-known network device manufacturer. The IP is `10.0.0.10`, which is within our normal subnet.
+
+#### Summary:
+This connection appears to be legitimate and may have occurred due to a benign ARP spoofing scenario where the source host was incorrectly assigned the destination MAC address of an Arista device via ARP requests. Given the low volume, this risk can likely be mitigated through standard network monitoring tools and possibly manual inspection with vendor support.
+
+**Final Note:**
+- Ensure all devices involved are properly identified by their respective manufacturers.
+- Consider using VLANs or other segmentation techniques to further restrict unauthorized traffic between these segments if possible.

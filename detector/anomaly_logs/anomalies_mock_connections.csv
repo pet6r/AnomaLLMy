@@ -1,0 +1,20 @@
+PROTOCOL,SRCMAC,SRCMFG,SRCIP,SRCPORT,DSTMAC,DSTMFG,DSTIP,DSTPORT,CNT
+TCP,a0:d3:c1:aa:bb:cc,"Apple, Inc.",192.168.1.150,EPH,de:ad:be:ef:00:01,UNKNOWN,104.20.15.1,443,112.0
+TCP,de:ad:be:ef:00:01,UNKNOWN,104.20.15.1,443,a0:d3:c1:aa:bb:cc,"Apple, Inc.",192.168.1.150,EPH,98.0
+TCP,a0:d3:c1:aa:bb:cc,"Apple, Inc.",192.168.1.150,EPH,de:ad:be:ef:00:01,UNKNOWN,104.20.15.1,80,3.0
+TCP,de:ad:be:ef:00:01,UNKNOWN,104.20.15.1,80,a0:d3:c1:aa:bb:cc,"Apple, Inc.",192.168.1.150,EPH,1.0
+,,,,,,,,,
+UDP,f8:75:a4:dd:ee:ff,Dell Inc,192.168.1.55,EPH,aa:bb:cc:00:11:22,UNKNOWN,192.168.1.20,12345,5.0
+UDP,aa:bb:cc:00:11:22,UNKNOWN,192.168.1.20,EPH,f8:75:a4:dd:ee:ff,Dell Inc,192.168.1.55,54321,2.0
+,,,,,,,,,
+UDP,b8:27:eb:11:22:33,Raspberry Pi Foundation,192.168.1.30,5353,01:00:5e:00:00:fb,MULTICAST,224.0.0.251,5353,15.0
+UDP,c2:30:6b:44:55:66,"Hangzhou H3C Technologies Co., Limited",192.168.1.88,5353,01:00:5e:00:00:fb,MULTICAST,224.0.0.251,5353,8.0
+,,,,,,,,,
+ARP,00:15:17:77:88:99,Intel Corporate,192.168.1.1,,12:34:56:78:9a:bc,UNKNOWN,192.168.1.150,,2.0
+ARP,12:34:56:78:9a:bc,UNKNOWN,192.168.1.150,,00:15:17:77:88:99,Intel Corporate,192.168.1.1,,1.0
+,,,,,,,,,
+ICMP,a0:d3:c1:aa:bb:cc,"Apple, Inc.",192.168.1.150,,00:15:17:77:88:99,Intel Corporate,192.168.1.1,,4.0
+ICMP,00:15:17:77:88:99,Intel Corporate,192.168.1.1,,a0:d3:c1:aa:bb:cc,"Apple, Inc.",192.168.1.150,,4.0
+,,,,,,,,,
+TCP,00:50:56:ab:cd:ef,VMware Inc,10.0.0.5,EPH,f0:09:0d:12:34:56,Arista Networks Inc,10.0.0.10,9999,25.0
+TCP,f0:09:0d:12:34:56,Arista Networks Inc,10.0.0.10,9999,00:50:56:ab:cd:ef,VMware Inc,10.0.0.5,EPH,18.0

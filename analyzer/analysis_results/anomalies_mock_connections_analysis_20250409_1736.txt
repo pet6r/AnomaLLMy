@@ -1,0 +1,342 @@
+
+===========================================================
+ANOMALY ANALYSIS RESULTS
+===========================================================
+Source File: anomalies_mock_connections.csv
+Model Used: gemma2:2b
+Analysis Date: 2025-04-09 17:36:08
+===========================================================
+
+
+ANALYSIS METRICS:
+===============================
+1. Performance Metrics:
+   - Total Elapsed Time: 45.22 seconds
+   - Average Response Rate: 49.48 words/second
+
+2. Content Metrics:
+   - Total Word Count: 2218
+   - Total Character Count: 16293
+   - Total Sentence Count: 163
+   - Average Word Length: 7.35 characters
+   - Average Sentence Length: 13.61 words
+   - Average Vocabulary Richness: 0.5230
+
+3. Content Analysis:
+   - Top 5 Most Common Words: device (36), connection (33), is (22), address (13), unknown (12)
+===============================
+
+
+===== Connection Group 1 Analysis =====
+## Anomalous Connection Analysis
+
+**Connection Group:**  Anomalous connections based on unknown device (OUI) and non-allowed protocol usage
+
+**Detailed Insights by Connection Group:**
+
+
+**Group 1:**
+
+* **Device Identification:**  
+    * Unknown Device: The OUI "de:ad:be:ef:00:01" is not in our baseline, indicating a potential newly introduced device or a device with an unusual MAC address. 
+    * Manufacturer (MFG): Apple, Inc.  (based on SRCMFG)
+    * IP Address: SRCIP - 192.168.1.150; DSTIP - 104.20.15.1
+* **Communication Details:**  
+    * Protocols: TCP 
+    * Ports: 
+        * Source (SRCPORT) - 443 for HTTPS traffic
+        * Destination (DSTPORT) - 80 for HTTP traffic
+    * Other Details: The communication appears to be from an unknown device (OUI) attempting a connection with Apple, Inc. on port 443 and port 80.
+* **Traffic Volume:** CNT - 1.0, indicating potentially high frequency of connections, but further analysis is needed for context.
+* **Risk Assessment:**   **Medium** 
+    * **Reasoning:** The communication protocols (TCP) indicate a possible attack attempt as well as the use of ports such as 443 and 80 that are often used in web traffic. This may be an initial communication or part of a broader attack effort. Further investigation is required to assess risk level accurately.
+* **Recommendations:**  **Monitor.** Conduct further analysis on the source and destination IP address, MAC address, and protocol usage to understand if this is malicious activity.
+
+**Group 2:**
+
+
+* **Device Identification:**
+    * Unknown Device (OUI):  No known devices are detected for the DSTMAC in connection group two
+    * Manufacturer (MFG): Apple, Inc. 
+    * IP Address: DSTIP - 104.20.15.1
+* **Communication Details:** 
+    * Protocols: TCP
+    * Ports: 
+        * Source (SRCPORT) - EPH (ephemeral port range > 1024)
+        * Destination (DSTPORT) - 443 for HTTPS traffic, and 80 for HTTP traffic.
+    * Other Details: This connection appears to be from the unknown device (OUI) attempting a connection with Apple, Inc., possibly a communication attempt with the previous connection.
+* **Traffic Volume:**  CNT - 98.0, indicating frequent connections within a specific time frame. Further analysis is required for context. 
+* **Risk Assessment:**  **Medium-High**
+    * **Reasoning:** While the connection appears to be initiated from an unknown device (OUI), it uses established protocols and ports. However, the volume of traffic suggests an ongoing or persistent attempt to reach Apple, Inc., making this connection risky. 
+* **Recommendations:**  **Investigate Further.** If the purpose of these communications is legitimate and non-suspicious, then monitoring should be sufficient. For any suspicious activity, blocking may be required until further investigation is completed.
+
+
+**Additional Notes**
+
+*  The use of ephemeral ports (e.g., EPH) increases the difficulty in identifying malicious connections. It suggests an attack vector that attempts to obfuscate their true purpose. 
+*  Analyzing traffic patterns and protocols can help identify potential attacks or unusual activity within your network environment. 
+
+
+
+
+Let me know if you'd like a more in-depth analysis or want to explore specific areas further! 
+
+
+===== Connection Group 2 Analysis =====
+## Anomaly Analysis Report: Anomalous Connection Group
+
+**Source File:** anomalies_mock_connections.csv
+
+**Connection Group:**
+
+* **PROTOCOL:** UDP
+* **SRCMAC:** f8:75:a4:dd:ee:ff 
+* **SRCMFG:** Dell Inc 
+* **SRCIP:** 192.168.1.55  
+* **SRCPORT:** EPH (Ephemeral port >1024) 
+* **DSTMAC:** aa:bb:cc:00:11:22 
+* **DSTMFG:** UNKNOWN 
+* **DSTIP:** 192.168.1.20  
+* **DSTPORT:** 54321
+* **CNT:** 2
+
+**Analysis:**
+
+This connection group exhibits several anomalous characteristics, necessitating further investigation and analysis:
+
+**1. Device Identification and Communication Details:**
+
+* The source device (SRCIP) is identified as "192.168.1.55" belonging to Dell Inc., with a potentially unknown MAC address (f8:75:a4:dd:ee:ff). 
+* The destination device (DSTMAC) has an address of "aa:bb:cc:00:11:22" and the unknown MFG is also associated with Dell. 
+
+**2. Traffic Volume:**
+
+The traffic volume ("CNT") is relatively high, suggesting a significant amount of communication between these devices. This could be a result of a data transfer or a control command in real-time.  
+
+
+**3. Risk Assessment:**
+
+* **High Risk:** The combined factors of unknown device and protocol usage, coupled with the high traffic volume, point towards a potential security risk. 
+   * Unknown MFG raises suspicion about the legitimate purpose of communication.
+   * Using UDP for an industrial control system is highly unusual. 
+  
+**4. Recommendations:**
+
+* **Immediate Action:** The connection needs to be monitored and investigated immediately.  Blocking all traffic associated with this unknown device based on MAC address and protocol (UDP) is recommended until a proper understanding of the communication pattern can be established. 
+
+
+**Further Investigation:**
+
+1. **Network Mapping:** Conduct network mapping and device discovery to identify any potential vulnerabilities and ensure no unauthorized access is occurring.
+2. **Protocol Analysis:** Investigate the purpose of UDP in this context. Is this normal behavior for an industrial control system? 
+3. **Device Authorization:** Verify the legitimacy of both devices involved by checking their associated credentials with the IT department.
+4. **Secure Communication Protocols:** Implement secure communication protocols like HTTPS for future communications and ensure only authorized devices are allowed on the network.
+
+
+**Disclaimer:** This analysis is based on limited data and requires further investigation and consultation with security experts to make a comprehensive decision regarding the anomalous connection.  
+
+
+===== Connection Group 3 Analysis =====
+## Anomalous Connection Analysis
+
+**Connection Group:** UDP, Protocol: UDP 
+
+
+**1. Device Identification:**
+
+* **Device 1:**  Manufacturer: Raspberry Pi Foundation (MFG) - MAC Address: b8:27:eb:11:22:33
+    * **Description:** This device likely represents a Raspberry Pi (or similar embedded system). The use of the 'MULTICAST' address suggests that it is likely communicating with other devices on a network, potentially for industrial control. 
+
+* **Device 2:** Manufacturer: Hangzhou H3C Technologies Co., Limited (MFG) - MAC Address: c2:30:6b:44:55:66
+    * **Description:** This device is likely related to networking equipment like a switch, router, or other industrial control-related hardware. 
+
+
+**2. Communication Details:**
+
+* **Protocol:** UDP
+* **IP Addresses:**  SRCIP: 192.168.1.30 (Device 1), DSTIP: 224.0.0.251  (Server, potentially)
+    *  **Note:** The SRCIP is the source IP address of the device making the connection (likely from an industrial control system).
+    * **Note:** DSTIP indicates that this device is likely attempting to connect to a server or other device on 224.0.0.251, which could be a gateway device or server within the ICS.
+* **Ports:**
+    * **SRC Port:** 5353 (Unknown purpose but likely for inter-device communication)
+    * **DST Port:** 5353 (Likely for inter-device communication)
+
+**3. Traffic Volume:**
+
+* **CNT:**  
+    * Connection 1: CNT = 2 
+    * Connection 2: CNT = 2
+
+
+**4. Risk Assessment:**
+
+* **Risk Level:** High
+* **Reasoning:** 
+    * **Unidentified Devices:** The presence of unknown devices (OUI) suggests potential unauthorized access or malicious activity, especially if the devices are from companies not typically in a connected industrial environment.  The use of UDP adds to this risk as it is less secure and less prone to being logged for security analysis. 
+    * **Protocol Use:** The unusual combination of protocols, such as UDP over TCP, indicates unanticipated communication, suggesting either an attempt at bypassing traditional network security measures or a deliberate connection attempt by a known attacker.
+    * **Destination IP Address:**  IP address 224.0.0.251 often represents the gateway device in industrial control systems. This could indicate that the connection is attempting to access critical infrastructure, potentially causing significant damage.
+
+
+**5. Recommendations:**
+
+* **Action:** Block these connections immediately.
+    * The devices are exhibiting suspicious activity and should be blocked until their purpose can be determined. 
+* **Further Investigation:**
+     *  Investigate the purpose of the traffic using tools like packet analyzers, network monitoring software, or intrusion detection systems (IDS). 
+
+**Note:** A deeper investigation is required to assess the specific risks associated with these connections and the potential harm they may pose. This report provides initial insights but must be reviewed by security experts.  
+
+
+===== Connection Group 4 Analysis =====
+## Anomalous Connection Group Analysis
+
+**Connection Details:**
+
+* **Protocol:** ARP
+* **Device Identification:** 
+    * SRCMAC: 00:15:17:77:88:99 (Intel Corporate)
+    * DSTMAC: UNKNOWN (Not in baseline)
+* **Communication Details:**
+    * **Source IP address (SRCMIP):**  NaN (Missing for unknown source device)
+    * **Source Port (SRCPOR):** 12:34:56:78:9a:bc (Ephemeral Port)
+    * **Destination IP address (DSTIP):** 192.168.1.150
+    * **Destination Port (DSTPOR):**  NaN (Missing for unknown destination device)
+
+**Traffic Volume Analysis:**
+
+* **CNT:** 2.0
+
+**Risk Assessment:**
+
+* **Risk Level:** High 
+    * **Reasoning:** The use of an ARP protocol and the lack of a known source IP address raise significant red flags. An ARP protocol is typically used for network discovery, and the lack of a known source IP address suggests potential stealth communication attempts or unauthorized network access. This connection utilizes an unknown MAC address, further increasing risk, as it could indicate malicious intent.  
+
+**Recommendations:**
+* **Action:** Block this connection immediately. 
+    * Detailed investigation should be conducted by security personnel to determine the source of these communications and any potential associated risks.
+
+
+**Explanation of Actions:** 
+
+* **ARP Protocol Use:** The ARP protocol is often used for network discovery, but its use in this way (with no established communication context) raises immediate concerns.
+* **Unknown Device and IP Addresses:**  An unknown MAC address and an IP address not known to the baseline network indicate potential malicious activity or a compromised device. 
+
+
+**Additional Considerations:**
+
+* A detailed investigation is required to understand the purpose of this connection, the attacker's intention, and any potential impact on the ICS environment.
+* Implement further monitoring protocols to detect similar anomalous traffic patterns in the future.
+
+
+
+**Note**:  This analysis is based on a limited dataset. Further investigation may reveal additional information that can be used to refine risk assessment and recommendations. 
+
+
+===== Connection Group 5 Analysis =====
+## Analysis of Anomalous Connections
+
+**Connection Group:**
+
+* **PROTOCOL:** ICMP 
+* **SRCMAC:**  a0:d3:c1:aa:bb:cc
+* **SRCMFG:** Apple, Inc.
+* **SRCIP:** 192.168.1.150
+* **SRCPORT:**  NaN (Ephemeral Port)
+* **DSTMAC:** 00:15:17:77:88:99
+* **DSTMFG:** Intel Corporate
+* **DSTIP:** 192.168.1.1
+* **DSTPORT:**  NaN (Ephemeral Port)
+* **CNT:** 4.0
+
+**Device Identification & Communication Details:**
+
+- Device 1: Apple, Inc. - MAC Address "a0:d3:c1:aa:bb:cc"
+    - Manufacturer: Apple, Inc.
+    - Outgoing connections from unknown IP, but using the same port as the receiving device (4.0)
+
+
+- Device 2: Intel Corporate -  MAC Address "00:15:17:77:88:99"
+    - Manufacturer: Intel Corporation
+    - Receiving connection requests on an ephemeral port (4.0), but using the same MAC address as the sending device (4.0)
+
+
+
+**Communication Details:**
+
+* **Protocols:**  ICMP (Internet Control Message Protocol) 
+* **IP Addresses:**  Not specified in the provided data, but likely within a private or internal network.
+* **Ports:** Both devices are using ephemeral ports for this connection.
+
+
+**Traffic Volume (CNT):**
+
+The "CNT" field is 4.0, indicating four ICMP packets exchanged between these devices in a short time frame.
+
+
+**Risk Assessment:**
+
+- **Risk Level:** Medium.  ICMP traffic can be used by various applications within an organization.  
+   
+    - The anomalous connection could indicate potential network reconnaissance attempts or compromised systems (if the source device is a known endpoint).
+
+**Recommendations:**
+
+- **Monitor:** Closely monitor the ICMP connections to identify any unusual patterns in behavior, such as excessive traffic volume, frequency of requests, or destination IP address. 
+- **Investigate:** Perform further investigation using network traffic analysis and system logs if there's evidence of suspicious activity.
+
+
+**Additional Considerations:**
+
+* **Protocol Analysis:**  Determining the specific ICMP protocol used (ping, traceroute, etc.) will provide further insight into the connection's purpose. 
+* **Network Traffic Anomaly Detection:** Implement additional anomaly detection mechanisms to identify and respond to similar anomalous connections in the future.
+
+  
+**Note**: This is just a preliminary analysis. Further investigation with tools such as network monitoring platforms or intrusion detection systems may be necessary for a complete risk assessment. The recommendations are primarily to facilitate further investigation and provide potential security actions. 
+
+
+
+
+===== Connection Group 6 Analysis =====
+## Anomalous Connection Analysis
+
+**Connection Group Summary:**
+
+The provided connection data shows two TCP connections that have been flagged as anomalous by our baseline detection system. The anomalies are likely related to a communication between two devices: VMware Inc and Arista Networks Inc, with unknown MAC addresses involved in the communication.
+
+**Detailed Analysis:**
+ 
+* **Device Identification:** 
+    * **VMware Inc (SRCMFG):** Manufacturer of software and virtual machines.
+    * **Arista Networks Inc (DSTMFG):**  Manufacturer of networking equipment often used for industrial control systems (ICS) in various industries.
+
+* **Communication Details:**
+    * **Protocol:** TCP (Transmission Control Protocol). 
+    * **IP Addresses & Ports:** 
+        * Source IP:  10.0.0.5 (VMware Inc)
+        * Source Port: EPH f0:09:0d:12:34:56 (EPH is an ephemeral port) - Likely used for client communication
+        * Destination IP: 10.0.0.10 (Arista Networks Inc)
+        * Destination Port: 9999
+    * **Traffic Volume (CNT):** The connection shows a significant volume of traffic, indicating a potentially high-impact communication activity.
+
+
+* **Risk Assessment:**
+
+   Based on the data, the risk level for these anomalous connections is likely **High**.  The following factors contribute to this assessment:
+
+    * **Unknown Device(s):** The presence of unknown devices (OUI) raises immediate concern as it suggests potential malicious intent or a newly discovered vulnerability. 
+    * **Protocol:** TCP is generally used for diverse protocols like web browsing and other applications, but the specific usage in this case could be linked to an ICS environment where communication needs to be secured with specific protocols and rules. 
+
+* **Recommendations:**  
+
+    * **Block the connection immediately.** If these connections are not necessary for critical functions and there is no clear legitimate reason for them to be active at this time, blocking the connection will help mitigate risk before a potential attack takes place.
+   
+
+
+**Further Actions:**
+
+To strengthen cybersecurity efforts further: 
+
+* **Investigate Further:** A dedicated security team should investigate these connections by analyzing firewall logs, network traffic records, and user activity within the VMware Inc system to identify any relevant information that might provide insights into their purpose. 
+* **Contextual Analysis:**  Understanding the specific tasks or processes performed by each device is crucial. For instance, VMware Inc hosts virtual machines and may have connections to other devices (ICS) via its software; this context helps understand if these connections are part of legitimate system operations.
+
+By following these recommendations and understanding the data's implications, security personnel can effectively address potential security threats posed by these anomalous connections.  

@@ -1,0 +1,271 @@
+
+===========================================================
+ANOMALY ANALYSIS RESULTS
+===========================================================
+Source File: anomalies_mock_connections.csv
+Model Used: llama3.2:1b
+Analysis Date: 2025-04-09 17:21:39
+===========================================================
+
+
+ANALYSIS METRICS:
+===============================
+1. Performance Metrics:
+   - Total Elapsed Time: 23.68 seconds
+   - Average Response Rate: 70.37 words/second
+
+2. Content Metrics:
+   - Total Word Count: 1665
+   - Total Character Count: 11856
+   - Total Sentence Count: 126
+   - Average Word Length: 7.12 characters
+   - Average Sentence Length: 13.21 words
+   - Average Vocabulary Richness: 0.5657
+
+3. Content Analysis:
+   - Top 5 Most Common Words: device (19), connection (18), 0 (17), inc (16), group (7)
+===============================
+
+
+===== Connection Group 1 Analysis =====
+**Anomalous Connection Analysis Report**
+
+**Connection Group:** TCP a0:d3:c1:aa:bb:cc Apple, Inc.
+
+### Device Identification and Communication Details
+
+* **Manufacturer (MFG):**
+	+ **Device Name:** Apple
+	+ **MAC Addresses:**
+		- 192.168.1.150 (known device)
+		- EPH de:ad:be:ef:00:01 (unknown device)
+* **Protocols and Ports:**
+
+| Protocol | Source Port | Destination Port | Purpose |
+| --- | --- | --- | --- |
+| TCP | 443 | 443 | HTTPS |
+
+### Traffic Volume Analysis
+
+* **Packet Counts:** The CNT field represents packet counts for each connection. While it's not possible to analyze the exact packets sent, we can infer that this connection group is relatively small.
+
+**Risk Assessment**
+
+Based on the protocols used (HTTPS), unknown device (EPH), and the lack of a known manufacturer name, I would classify this anomalous connection as **Medium-Risk**. The presence of HTTPS suggests that there may be sensitive data being transmitted between devices, but without further information, it's difficult to determine the significance.
+
+### Recommendations
+
+Given the medium-risk classification, I recommend the following actions for security personnel:
+
+* **Block:** Close the connection to prevent any potential malicious activity.
+* **Monitor:** Continue monitoring the connection group for any suspicious activity in the future.
+
+===== Connection Group 2 Analysis =====
+**Anomalous Connection Group Analysis**
+
+### Device Identification
+
+| Device | Manufacturer (MFG) |
+| --- | --- |
+| Dell Inc |  |
+
+### Communication Details
+
+| Protocol | SRCIP SRCPORT DSTIP DSTPORT | CNT |
+| --- | --- | --- |
+| UDP | 192.168.1.20:12345 | 2.0 |
+| UDP | 192.168.1.55:54321 | 5.0 |
+
+### Risk Assessment
+
+Based on the protocols and communication patterns, I assess the risk level of these anomalous connections as Medium.
+
+* The use of an unknown device (Dell Inc) with a MAC address "aa:bb:cc:00:11:22" suggests that it may be a legitimate device from the same manufacturer, but its exact purpose is unclear.
+* The protocol used for communication is UDP, which can be used for various purposes such as data transfer or network testing. However, the lack of a specific port number and the fact that both devices use the ephemeral port EPH makes it harder to determine the purpose of the connection.
+
+### Recommendations
+
+Based on my analysis, I recommend the following actions:
+
+* Investigate Dell Inc's device and its role in the network environment.
+* Block any further connections from Dell Inc using UDP protocol with ports above 1024 (e.g., TCP port 443 for HTTPS).
+
+**Additional Insights:**
+
+* The fact that both devices use EPH as their ephemeral port suggests that they may be communicating with each other on a trusted basis, which could indicate a legitimate connection.
+* However, the lack of specific information about the purpose of the UDP connections makes it harder to determine whether this is a legitimate communication or an anomaly.
+
+**Conclusion:**
+
+These anomalous connections appear to be related to Dell Inc devices and may be part of a larger network issue. Further investigation is necessary to determine the exact nature of these connections and their potential impact on the network environment.
+
+===== Connection Group 3 Analysis =====
+**Anomalous Connection Group Analysis**
+
+### Device Identification and Communication Details
+
+| Connection Group | Protocol            | Source MAC       | Source MFG         | Source IP      | Destination MAC     | Destination MFG   | Destination IP     | Destination Port | CNT |
+|-----------------|-------------------|--------------------|------------------|---------------|--------------------|------------------|-----------------|-----------|-----|
+| PROTOCOL        | UDP               | 8a:0c:11d:e5:66 | Raspberry Pi Foundation 192.168.1.30    5353 01:00:5e:00:fb MULTICAST 224.0.0.251    5353 15.0 | 2b:4f:32:a9:55:6a | Hangzhou H3C Technologies Co., Limited 192.168.1.88    5353 01:00:5e:00:00:fb MULTICAST 224.0.0.251    5353  8.0 |
+
+* **Raspberry Pi Foundation:** A popular open-source single-board computer (SBC) used in various IoT applications.
+* **Hangzhou H3C Technologies Co., Limited:** A Chinese enterprise network equipment manufacturer, likely providing industrial networking solutions.
+
+### Traffic Volume Analysis
+
+| Connection Group | CNT |
+|-----------------|-----|
+| PROTOCOL        | 15.0 |
+
+The single packet count value of 15 indicates a relatively low volume of traffic for this connection group.
+
+### Risk Assessment
+
+Based on the protocols and devices involved, I would assess these connections as **Low** in risk level.
+
+* The use of UDP (User Datagram Protocol) with no specific protocol designation suggests a simple data transfer without encryption or authentication.
+* The involvement of Raspberry Pi Foundation and Hangzhou H3C Technologies Co., Limited is not alarming, as both are widely used IoT devices with varying levels of security configurations.
+* However, the fact that both protocols have an ephemeral port (EPH) uses makes it possible for unknown attackers to easily exploit vulnerabilities in these devices.
+
+### Recommendations
+
+Based on the analysis, I recommend **allowing** these connections:
+
+1. **Block:** Ensure that all Raspberry Pi Foundation and Hangzhou H3C Technologies Co., Limited devices are properly configured with robust security measures (e.g., encryption, authentication) to prevent potential exploitation.
+2. **Monitor:** Continuously monitor these connections for any unusual activity or suspicious patterns that may indicate a potential threat.
+
+Please note that this analysis is based on the provided data and should be reviewed and validated by human experts before being implemented in production environments.
+
+===== Connection Group 4 Analysis =====
+**Anomalous Connection Group Analysis**
+
+### **Device Identification and Communication Details**
+
+* **Devices Involved:**
+	+ Intel Corporation devices:
+		- Intel Corporate (MFG) devices are known for their widespread use in industrial control systems, which makes them a prime candidate for investigation.
+	+ Unknown device:
+		- Device identified as "UNKNOWN" with an IP address and MAC address that cannot be linked to any other known device or manufacturer.
+
+* **Protocols Used:**
+	+ ARP (Address Resolution Protocol) is used, indicating a communication layer above the TCP/IP protocol stack.
+	+ Protocol for 443 HTTPS connection
+	+ Port 12:34:56:78:9a:bc and 00:15:17:77:88:99 are ephemeral ports (EPH) used by clients.
+
+* **IP Addresses and Ports:**
+	+ Source IP address is unknown, but the destination IP addresses seem to be within our network.
+	+ Ephemeral ports:
+		- Port 12:34:56:78:9a:bc
+		- Port 00:15:17:77:88:99
+
+### **Traffic Volume and Risk Assessment**
+
+* **CNT (Packet Count) Field:**
+	+ 2 packets for ARP 00:15:17:77:88:99
+	+ NaN (Not a Number) or unknown packet count for ARP 12:34:56:78:9a:bc
+
+* **Risk Level Assessment:**
+
+	+ Protocols used are known and allowed by our baseline detection system.
+	+ Devices involved are industrial control systems, which pose a significant risk due to their potential vulnerabilities.
+
+### **Recommendations**
+
+Based on the analysis, I recommend that security personnel take the following actions:
+
+#### Blocking:
+* Block all incoming connections with ephemeral ports (12:34:56:78:9a:bc and 00:15:17:77:88:99) using firewall rules.
+* Consider monitoring these ports for suspicious activity.
+
+#### Monitoring:
+* Monitor these connections closely to detect any potential security breaches or anomalies.
+* Investigate the source of the connections if they remain active after blocking.
+
+#### Investigation:
+* Investigate the unknown device identified as "UNKNOWN" to determine its purpose and ownership.
+* Determine if there are any underlying protocols or services that could be contributing to this connection.
+
+#### Allowing:
+* Allow incoming connections with ephemeral ports (12:34:56:78:9a:bc and 00:15:17:77:88:99) based on the protocols used, but monitor for suspicious activity.
+
+===== Connection Group 5 Analysis =====
+**Anomalous Connection Analysis**
+
+**Connection Group:** ICMP a0:d3:c1:aa:bb:cc - Apple, Inc. (192.168.1.150)
+---------------------------------------------------------
+
+### Device Identification
+
+* Manufacturer: Apple, Inc.
+* MAC Address: 00:15:17:77:88:99
+* Protocol Type: ICMP (Internet Control Message Protocol)
+
+**Communication Details**
+
+| Field | Description |
+| --- | --- |
+| PROTOCOL | Internet Control Message Protocol (ICMP) |
+| SRCIP | Source IP address: Apple, Inc. (192.168.1.150) |
+| SRCPORT | Source port: a0:d3:c1:aa:bb:cc ( ephemeral port EPH) |
+| DSTIP | Destination IP address: Intel Corporate (192.168.1.1) |
+| DSTPORT | Destination port: NaN (no specific value, likely unknown) |
+
+### Traffic Volume
+
+* CNT (Packet Count): 2
+
+**Risk Assessment**
+
+Based on the protocols and device involved, this connection is classified as High Risk.
+
+The use of ephemeral ports EPH by Apple, Inc. raises concerns about potential misconfiguration or exploitation of the port range. Additionally, the presence of an unknown device (Apple, Inc.) with a MAC address that doesn't match our baseline increases the likelihood of malicious activity.
+
+**Recommendations**
+
+To mitigate this risk:
+
+* Block traffic on Apple, Inc.'s interface to Intel Corporate's interface.
+* Monitor for any further unusual connections from this device.
+* Investigate possible misconfigurations or exploitation by exploiting ephemeral ports EPH.
+
+Note: Based on the provided data, it is unclear what specific actions need to be taken. However, as a general recommendation, we should consider blocking traffic to prevent potential malicious activity and monitoring for suspicious behavior.
+
+===== Connection Group 6 Analysis =====
+**Anomalous Connection Group Analysis**
+
+### Device Identification and Communication Details
+
+| Connection Group | Device Identification | Communication Details |
+| --- | --- | --- |
+| PROTOCOL            | TCP                 | SrcMAC              | SrcMFG | SRCIP | SRCPORT | DSTMAC               | DSTMFG | DSTIP | DSTPORT | CNT |
+|  | 00:50:56:ab:cd:ef     | VMware Inc      | EPH f0:09:0d:12:34:56 | Arista Networks Inc | 10.0.0.5   | EPH   9999          | 25.0          |  | 18.0        |  |
+|  | f0:09:0d:12:34:56     | Arista Networks Inc | 9999 00:50:56:ab:cd:ef | VMware Inc      | 10.0.0.5   | EPH    9999          | 18.0        |  | 25.0        | |
+
+### Port Notes
+
+* The connection utilizes ephemeral ports (Ephemeral Ports) on clients, which is a deviation from our baseline protocol.
+* The communication protocols used are TCP and UDP.
+
+### Traffic Volume Analysis
+
+| Connection Group | CNT |
+| --- | --- |
+| PROTOCOL            | 25   |
+
+### Risk Assessment and Recommendations
+
+Based on the information provided, the following risk assessment can be made:
+
+* **Device Identification**: VMware Inc. is a well-known manufacturer of industrial control systems (ICS) products, including those used in our environment.
+* **Communication Details**:
+	+ The connection uses TCP as the communication protocol, which is generally safe and secure for most applications.
+	+ The use of EPH port 9999 on the client side could potentially be a security vulnerability or an attempt to bypass ICS security measures. This requires further investigation.
+* **Traffic Volume**: The moderate number of connections (CNT = 25) may not indicate a significant security threat, but it is still worth monitoring for any unusual patterns.
+
+**Recommendations**:
+
+1. Investigate the client side connection using EPH port 9999 to determine if it is legitimate or malicious.
+2. Monitor this connection and other similar connections in the environment to identify any potential security threats.
+3. Consider blocking or allowing access to devices associated with this IP address range (10.0.0.5) based on further investigation and analysis.
+
+Note: The final decision to block, monitor, investigate, or allow access to these devices will depend on the results of a thorough analysis and review by human experts.

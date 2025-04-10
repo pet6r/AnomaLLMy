@@ -1,0 +1,181 @@
+
+===========================================================
+ANOMALY ANALYSIS RESULTS
+===========================================================
+Source File: anomalies_mock_connections.csv
+Model Used: neural-chat:latest
+Analysis Date: 2025-04-09 17:20:37
+===========================================================
+
+
+ANALYSIS METRICS:
+===============================
+1. Performance Metrics:
+   - Total Elapsed Time: 76.11 seconds
+   - Average Response Rate: 23.33 words/second
+
+2. Content Metrics:
+   - Total Word Count: 1746
+   - Total Character Count: 11423
+   - Total Sentence Count: 183
+   - Average Word Length: 6.54 characters
+   - Average Sentence Length: 9.54 words
+   - Average Vocabulary Richness: 0.5827
+
+3. Content Analysis:
+   - Top 5 Most Common Words: device (38), unknown (22), 1 (22), is (16), inc (14)
+===============================
+
+
+===== Connection Group 1 Analysis =====
+ Anomalous Connection Group Analysis
+
+Device Identification:
+1. Device A (a0:d3:c1:aa:bb:cc) - Manufacturer (MFG): Apple, Inc., IP Address: 192.168.1.150, Protocol: EPH (ephemeral port)
+2. Device B (de:ad:be:ef:00:01) - Unknown Manufacturer, IP Address: 104.20.15.1, Protocol: UNKNOWN
+
+Communication Details:
+- Communication 1: TCP, Source: Apple Inc., Destination: Unknown, Ports: Source EPH (Ephemeral), Destination: HTTPS (443), CNT: 112.0
+- Communication 2: TCP, Source: Unknown, Destination: Apple Inc., Ports: Source UNKNOWN, Destination: HTTPS (443), CNT: 98.0
+- Communication 3: TCP, Source: Apple Inc., Destination: Unknown, Ports: Source EPH (Ephemeral), Destination: Web Server (80), CNT: 3.0
+- Communication 4: TCP, Source: Unknown, Destination: Apple Inc., Ports: Source HTTP (80), Destination: Ephemeral (Source port EPH), CNT: 1.0
+
+Traffic Volume:
+- The first and second connections have a higher packet count than the third and fourth connections. This suggests that the communication between Devices A and B might be more active or ongoing.
+
+Risk Assessment:
+- Considering the unknown manufacturer of Device B, it is possible that this device could be malicious or compromised. The communications with Apple Inc.'s devices seem normal for a typical client's traffic. However, there is a possibility of a man-in-the-middle attack where Device B intercepts the data between Devices A and their intended destinations, causing risk to the network security.
+
+Recommendations:
+1. Monitor the communications more closely between Apple Inc.'s devices (Devices A) and Unknown device (Device B) for any unusual activity. Pay special attention to traffic patterns and timing of connections.
+2. Investigate Device B and determine its purpose in the network environment or initiate quarantine procedures if found suspicious. Consider blocking connections from this unknown device until further analysis can be performed.
+3. Ensure proper configuration of firewall rules and security policies on Apple Inc.'s devices to protect against potential vulnerabilities, such as using encryption when possible and minimizing the use of insecure communication protocols like HTTP (port 80).
+
+===== Connection Group 2 Analysis =====
+ Anomalous Connection Group Analysis:
+
+Device Identification:
+- SRCMAC (f8:75:a4:dd:ee:ff) is a Dell Inc device with MAC address.
+- DSTMAC (aa:bb:cc:00:11:22) is an unknown device with MAC address.
+
+Communication Details:
+- Protocol: UDP (User Datagram Protocol).
+- SRCIP (192.168.1.55): Dell Inc device's IP address.
+- SRCPORT (EPH - Ephemeral port): A random high port number above 1024 used by clients.
+- DSTIP (192.168.1.20): Unknown device's IP address.
+- DSTPORT: No information about the destination port is available in the CSV file.
+
+Traffic Volume:
+- For both connections, the CNT value represents packet counts: 5000 (CNT = 5.0) and 2000 (CNT = 2.0).
+
+Risk Assessment:
+- Risk Level: Medium
+- Reasoning: UDP is a connectionless protocol that sends packets without any guarantee of arrival or order. These connections could indicate potential unauthorized communication between devices, making it necessary to investigate further and possibly implement access control lists on network devices to limit outbound traffic.
+
+Recommendations:
+- Security personnel should monitor the UDP communication between both devices for any suspicious activity or data leakage, as this protocol is commonly used in DDoS attacks and information exposure vulnerabilities. If no threat is identified after observation, consider allowing these connections within the network's security policies.
+
+===== Connection Group 3 Analysis =====
+ Anomalous Connection Group Analysis:
+
+1. Device Identification:
+   - b8:27:eb:11:22:33: Raspberry Pi Foundation device with unknown manufacturer and an IP address (192.168.1.30)
+   - c2:30:6b:44:55:66: Hangzhou H3C Technologies Co., Limited device with an IP address (192.168.1.88)
+
+2. Communication Details:
+   - Both connections are using UDP as the protocol, port 5353 is used by both source and destination devices for this communication.
+   - There are no other ports mentioned in the connection data.
+   - CNT field shows that each device has communicated with a multicast address (224.0.0.251) with 15 packets and 8 packets respectively.
+
+3. Traffic Volume:
+   The number of packets involved is low in both cases, but we lack data on the actual amount of traffic that was transmitted in this connection.
+
+4. Risk Assessment:
+   Since the protocol used (UDP) allows for broadcasting and multicasting, these connections could be involved in sending information to multiple hosts. This raises a medium risk level because it may imply an increased potential for packet loss or spoofing attacks on this network segment. It is essential to monitor these connections closely, as they seem out of the ordinary based on our baseline data.
+
+5. Recommendations:
+   Due to the lack of context about which services these devices are communicating with, we suggest the following actions for security personnel:
+   1. Investigate and confirm the necessity of these connections from both devices (Raspberry Pi and Hangzhou H3C Technologies Co., Limited)
+   2. Monitor closely to detect any potential security threats or performance issues related to this connection
+   3. Update network baselines to include device information, port usage, protocols, and communication patterns for enhanced threat detection
+   4. Implement an intrusion prevention system (IPS) to block unwanted traffic or mitigate potential attacks in real-time
+
+===== Connection Group 4 Analysis =====
+ Anomalous Connection Group Analysis:
+
+Device Identification:
+1. Device 1 (MAC: 00:15:17:77:88:99, MFG: Intel Corporate): Intel Corporation device with unknown purpose or functionality.
+2. Device 2 (MAC: 12:34:56:78:9a:bc, UNKNOWN): An unknown device, possibly non-standard or misconfigured.
+   - Since the MAC address is not in our baseline database, we cannot determine its manufacturer with certainty.
+
+Communication Details:
+1. Protocol: ARP (Address Resolution Protocol)
+2. IP Addresses:
+   - Source IP: 192.168.1.1
+   - Destination IP: 192.168.1.150
+3. Ports: Both ARP protocol uses specific ports, as per the nature of this connection. No additional information is available in the data about ephemeral ports.
+4. Traffic Volume: The CNT field indicates two connections with a total count of 2 and 1 packet each. A low number of packets might imply limited traffic.
+
+Risk Assessment:
+- Risk Level: Low to Medium (depending on your network's context).
+   - Intel Corporation devices are commonly used in enterprise environments, so their presence is not unusual. However, the unknown device with an unrecognized MAC address raises concerns about its purpose or potential vulnerabilities.
+
+Recommendations:
+- Monitor these connections closely to identify any anomalous behavior or communication patterns that might be harmful.
+   - If abnormal activity continues, further investigation and mitigation strategies could involve isolating the unknown device from critical systems or blocking its access.
+- Maintain updated baseline information on devices connected to your network, including MAC addresses and IPs.
+- Educate your organization about secure network practices and the importance of using only authorized and known hardware.
+   - This will help minimize the risk of unknown or malicious devices entering your network environment.
+
+===== Connection Group 5 Analysis =====
+ Anomalous Connection Group Analysis:
+Device Identification:
+1. Device with MAC a0:d3:c1:aa:bb:cc is manufactured by Apple, Inc., and connected from IP 192.168.1.150.
+2. Device with MAC 00:15:17:77:88:99 is manufactured by Intel Corporate and connected from IP 192.168.1.1, communicating to the above Apple device.
+
+Communication Details:
+1. Protocol used in both cases is ICMP (Internet Control Message Protocol). It's a fundamental Internet protocol that handles error messages, diagnostics, and control of network operations.
+2. Communication is bidirectional. Both devices exchange ICMP packets: from 192.168.1.150 to 192.168.1.1 with destination port NaN, and vice versa from 192.168.1.1 to 192.168.1.150 with source port NaN.
+3. Ports involved in this connection are: Source port is NaN (ephemeral), while Destination port also NaN, indicating it may be a direct broadcast to all hosts on the network.
+   - Common ports used for communication: 443 (HTTPS) or 514 (Syslog, Unix Remote Procedure Calls) could also be used here as outgoing/incoming ports, but this information is not provided.
+
+Traffic Volume:
+- CNT field represents packet counts and shows that both devices exchanged packets in a total of 8 packets each way.
+   - SRCMAC -> DSTMAC: 4 packets for Apple -> Intel connection and vice versa with 4 packets.
+   - Total count is 8 + 8 = 16 packets.
+
+Risk Assessment:
+- The risk level is considered as Low due to the nature of ICMP protocol, which is primarily used for network diagnostics and error handling.
+- It's possible that these connections are related to ping commands or network management tasks.
+
+Recommendations:
+- Since there is no evident threat from these connections and they appear to be involved in normal network activities, monitor them closely for anomalies.
+- Blocking this traffic might disrupt essential network operations (e.g., network diagnostics), so let's allow it temporarily and reassess the situation if any suspicious activity emerges.
+
+===== Connection Group 6 Analysis =====
+ Anomalous Connection Group Analysis:
+
+1. Device Identification:
+   a. Device 1 (MAC: 00:50:56:ab:cd:ef) - Manufacturer: VMware Inc., Model: Unknown
+     IP Address: 10.0.0.5
+     Protocol: TCP, Port: Ephemeral (EPH)
+   b. Device 2 (MAC: f0:09:0d:12:34:56) - Manufacturer: Arista Networks Inc., Model: Unknown
+     IP Address: 10.0.0.10
+     Protocol: TCP, Port: 9999
+   This indicates the involvement of devices from different manufacturers and a potential communication between them using non-standard protocols and ports.
+
+2. Communication Details:
+   - Protocol 1: TCP (Device 1 to Device 2)
+     IP address 10.0.0.5 (Client with EPH port): VMware Inc., Unknown device
+     IP address 10.0.0.10 (Arista Networks Inc. device with Port 9999)
+   - Protocol 2: TCP (Device 2 to Device 1)
+     IP Address 10.0.0.5 (Client with EPH port): VMware Inc., Unknown device
+     IP Address 10.0.0.10 (Arista Networks Inc. device with Port 9999)
+
+3. Traffic Volume: The CNT field represents packet counts for each connection and was not provided in the given data. Further investigation might be needed to determine the traffic volume.
+
+4. Risk Assessment:
+   This connection group involves unknown devices from different manufacturers and non-standard protocols and ports, which makes it challenging to assess its risk level without additional context. However, the high number of connections (18) between these two hosts may indicate potential abuse or an increased likelihood of a vulnerability being exploited. We can assume that this anomalous connection group poses a medium risk due to unidentified devices and unusual communication patterns.
+
+5. Recommendations:
+   Since the traffic volume (CNT field) was not provided, we cannot make an accurate recommendation about blocking or monitoring these connections. However, we recommend further investigation to understand if there is any known vulnerability associated with these protocols or unknown devices that may be putting our network at risk. If necessary, consider allowing specific communications after verifying their security and business requirements.
