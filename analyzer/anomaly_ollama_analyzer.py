@@ -22,14 +22,12 @@ class AnomalyOllamaAnalyzer:
         self.model_name = model_name
         self.anomaly_dir = os.path.join(current_dir, "../detector/anomaly_logs") if anomaly_dir is None else anomaly_dir
         self.output_dir = os.path.join(current_dir, "analysis_results") if output_dir is None else output_dir
-        # self.reports_dir = os.path.join(current_dir, "reports") # Removed
         self.stop_words = set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by'])
         self.specific_file = specific_file
         self.current_file = None
 
         # Create output directory if it doesn't exist
         os.makedirs(self.output_dir, exist_ok=True)
-        # Removed creation of reports_dir
 
         # Pre-define static parts of the prompt to avoid recreating
         self.base_prompt = """

@@ -1,0 +1,205 @@
+
+===========================================================
+ANOMALY ANALYSIS RESULTS
+===========================================================
+Source File: anomalies_mock_connections.csv
+Model Used: granite3-dense:8b
+Analysis Date: 2025-04-09 17:12:54
+===========================================================
+
+
+ANALYSIS METRICS:
+===============================
+1. Performance Metrics:
+   - Total Elapsed Time: 79.73 seconds
+   - Average Response Rate: 16.48 words/second
+
+2. Content Metrics:
+   - Total Word Count: 1268
+   - Total Character Count: 8262
+   - Total Sentence Count: 132
+   - Average Word Length: 6.52 characters
+   - Average Sentence Length: 9.61 words
+   - Average Vocabulary Richness: 0.5455
+
+3. Content Analysis:
+   - Top 5 Most Common Words: is (21), device (19), 1 (16), address (14), be (14)
+===============================
+
+
+===== Connection Group 1 Analysis =====
+1. Device Identification:
+   - Source Devices:
+     - MAC Address: a0:d3:c1:aa:bb:cc
+     - Manufacturer: Apple, Inc.
+     - IP Address: 192.168.1.150
+   - Destination Devices:
+     - MAC Address: de:ad:be:ef:00:01 (Unknown)
+     - Manufacturer: Unknown
+     - IP Address: 104.20.15.1
+
+2. Communication Details:
+   - Protocols: TCP
+   - Source Ports: EPH (ephemeral port > 1024)
+   - Destination Ports: 443 (HTTPS), 80 (HTTP)
+   - IP Addresses:
+     - Source: 192.168.1.150
+     - Destination: 104.20.15.1
+
+3. Traffic Volume:
+   - Total packet counts (CNT) for each connection:
+     - TCP a0:d3:c1:aa:bb:cc to de:ad:be:ef:00:01: 112.0
+     - TCP de:ad:be:ef:00:01 to a0:d3:c1:aa:bb:cc: 98.0
+     - TCP a0:d3:c1:aa:bb:cc to de:ad:be:ef:00:01: 3.0
+     - TCP de:ad:be:ef:00:01 to a0:d3:c1:aa:bb:cc: 1.0
+
+4. Risk Assessment:
+   - The anomalous connections involve an unknown device (MAC address de:ad:be:ef:00:01) and uses TCP protocol, which is not in our allowed protocol baseline.
+   - The destination IP address (104.20.15.1) is also unknown, and the communication involves both HTTPS (port 443) and HTTP (port 80) protocols.
+   - Given the combination of these factors, the risk level for these anomalous connections is HIGH.
+
+5. Recommendations:
+   - Block the unknown device (MAC address de:ad:be:ef:00:01) to prevent further unauthorized communication.
+   - Monitor the situation and investigate the source of the unknown device and its intentions.
+   - Allow the communication between the Apple device (MAC address a0:d3:c1:aa:bb:cc) and the known devices/IP addresses in the network environment.
+
+===== Connection Group 2 Analysis =====
+1. Device Identification:
+   - Source Devices:
+     - Manufacturer (MFG): Dell Inc
+     - MAC Address: f8:75:a4:dd:ee:ff
+     - IP Address: 192.168.1.55
+   - Destination Device:
+     - Manufacturer (MFG): UNKNOWN
+     - MAC Address: aa:bb:cc:00:11:22
+     - IP Address: 192.168.1.20
+
+2. Communication Details:
+   - Protocol: UDP (User Datagram Protocol)
+   - Source IP Address: 192.168.1.55
+   - Source Port: EPH (Ephemeral port > 1024)
+   - Destination IP Address: 192.168.1.20
+   - Destination Port: EPH (Ephemeral port > 1024)
+
+3. Traffic Volume:
+   - Total packet counts for this connection group: 7.0
+
+4. Risk Assessment:
+   - The use of an unknown device and UDP protocol in this connection group poses a high risk.
+   - UDP is commonly used for unreliable datagram protocols, which can be exploited by attackers to carry out DDoS attacks or exfiltrate data.
+   - The involvement of an unknown device further increases the risk, as its purpose and intentions are uncertain.
+
+5. Recommendations:
+   - Block this connection group to prevent potential security threats.
+   - Investigate the source and destination devices to determine their roles in the network environment.
+   - Monitor future connections involving these devices to ensure they adhere to the allowed protocol baseline.
+
+===== Connection Group 3 Analysis =====
+**Anomalous Connection Group Analysis**
+
+**Device Identification:**
+- The first device is a Raspberry Pi Foundation device with MAC address b8:27:eb:11:22:33.
+- The second device is a Hangzhou H3C Technologies Co., Ltd. device with MAC address c2:30:6b:44:55:66.
+
+**Communication Details:**
+- Both connections are using UDP protocol.
+- The source IP addresses are 192.168.1.30 and 192.168.1.88, respectively.
+- The destination IP addresses are 224.0.0.251.
+- The source ports are 5353, and the destination ports are also 5353.
+- The UDP protocol is commonly used for multicast traffic, which is indicated by the destination IP address being a multicast address (224.0.0.251).
+
+**Traffic Volume:**
+- The first connection has a CNT of 15.0.
+- The second connection has a CNT of 8.0.
+
+**Risk Assessment:**
+- The use of UDP protocol for multicast traffic is not inherently malicious, but it could be used for malicious purposes if the traffic is not properly secured or authenticated.
+- The fact that both devices are using the same destination port (5353) and the same multicast address (224.0.0.251) suggests that they may be part of a larger network or system.
+- The risk level is assessed as Medium, as further investigation is needed to determine if the traffic is legitimate or not.
+
+**Recommendations:**
+- Security personnel should investigate these connections to determine their purpose and origin.
+- If the traffic is found to be legitimate, it should be allowed to continue.
+- If the traffic is found to be malicious, it should be blocked and further action should be taken to secure the network.
+
+===== Connection Group 4 Analysis =====
+**Anomalous Connection Group Analysis**
+
+**Device Identification:**
+- Source Device: MAC address 00:15:17:77:88:99, Manufacturer Intel Corporate
+- Destination Device: MAC address 12:34:56:78:9a:bc, Unknown manufacturer
+
+**Communication Details:**
+- Protocol: ARP (Address Resolution Protocol)
+- Source IP: 192.168.1.1
+- Source Port: Not applicable for ARP
+- Destination IP: 192.168.1.150
+- Destination Port: Not applicable for ARP
+- Purpose of Ports: ARP is used to map IP addresses to MAC addresses, which is essential for communication between devices on a network.
+
+**Traffic Volume:**
+- Total packet counts (CNT) for this connection group: 3.0
+
+**Risk Assessment:**
+- Risk Level: Low
+  - Reasoning: The protocol used is ARP, which is a fundamental protocol for network communication. However, the destination device has an unknown manufacturer, which could potentially indicate a rogue or unauthorized device on the network.
+
+**Recommendations:**
+- Monitor this connection closely to ensure it does not exhibit any malicious behavior.
+- Consider investigating the source of the unknown device to determine if it is authorized to be on the network.
+- If the device is not authorized, block its access to the network and investigate further.
+
+===== Connection Group 5 Analysis =====
+**Anomalous Connection Group:**
+
+1. **Device Identification:**
+   - Source Device: MAC address a0:d3:c1:aa:bb:cc, Manufacturer Apple, Inc.
+   - Destination Device: MAC address 00:15:17:77:88:99, Manufacturer Intel Corporate
+
+2. **Communication Details:**
+   - Protocol: ICMP (Internet Control Message Protocol)
+   - Source IP: 192.168.1.150
+   - Destination IP: 192.168.1.1
+   - Source Port: Not applicable (ICMP is a connectionless protocol)
+   - Destination Port: Not applicable (ICMP is a connectionless protocol)
+   - Purpose of ICMP: Used for network diagnostics and error reporting
+
+3. **Traffic Volume:**
+   - Packet Count (CNT): 4.0 packets in each direction
+
+4. **Risk Assessment:**
+   - Risk Level: Low
+   - Reasoning: The use of ICMP is not inherently malicious, and the traffic volume is relatively low. However, it's important to note that ICMP can be used for network reconnaissance or denial-of-service attacks.
+
+5. **Recommendations:**
+   - Monitor this connection to ensure it remains legitimate. If the traffic volume increases significantly or if the communication pattern changes, further investigation may be necessary.
+
+===== Connection Group 6 Analysis =====
+1. Device Identification:
+   - Source devices:
+     - Manufacturer: VMware Inc, MAC address: 00:50:56:ab:cd:ef
+   - Destination device:
+     - Manufacturer: Arista Networks Inc, MAC address: f0:09:0d:12:34:56
+
+2. Communication Details:
+   - Protocol: TCP (Transmission Control Protocol)
+   - IP addresses:
+     - Source: 10.0.0.5
+   - Ports:
+     - Source: EPH (ephemeral port > 1024)
+     - Destination: 9999
+   - Purpose of the ports: The purpose of the ephemeral port is not known without additional context, as it is dynamically assigned by the operating system for client-side connections. The destination port 9999 is not a standard port and its purpose would need to be determined through further investigation.
+
+3. Traffic Volume:
+   - CNT: 25.0 (packet counts for each connection)
+
+4. Risk Assessment:
+   - The risk level of these anomalous connections is HIGH due to the following reasons:
+     - Unknown device (VMware Inc) and unknown protocol (TCP on ephemeral port)
+     - Communication with a device from an unfamiliar manufacturer (Arista Networks Inc)
+     - Use of a non-standard destination port (9999)
+
+5. Recommendations:
+   - Investigate the source of the traffic from the VMware Inc device and determine its purpose.
+   - Block the traffic until it can be confirmed as legitimate or malicious.
+   - Monitor the traffic for further analysis and potential threats.

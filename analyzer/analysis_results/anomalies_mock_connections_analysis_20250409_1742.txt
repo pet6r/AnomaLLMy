@@ -1,0 +1,296 @@
+
+===========================================================
+ANOMALY ANALYSIS RESULTS
+===========================================================
+Source File: anomalies_mock_connections.csv
+Model Used: gemma2:9b
+Analysis Date: 2025-04-09 17:42:59
+===========================================================
+
+
+ANALYSIS METRICS:
+===============================
+1. Performance Metrics:
+   - Total Elapsed Time: 123.39 seconds
+   - Average Response Rate: 16.34 words/second
+
+2. Content Metrics:
+   - Total Word Count: 1979
+   - Total Character Count: 14433
+   - Total Sentence Count: 220
+   - Average Word Length: 7.29 characters
+   - Average Sentence Length: 9.00 words
+   - Average Vocabulary Richness: 0.5151
+
+3. Content Analysis:
+   - Top 5 Most Common Words: device (57), 1 (35), 0 (22), connection (15), be (10)
+===============================
+
+
+===== Connection Group 1 Analysis =====
+## Anomalous Connection Analysis Report
+
+**Connection Group:**
+
+| PROTOCOL | SRCMAC      | SRCMFG         | SRCIP | SRCPORT            | DSTMAC      | DSTMFG         | DSTIP  | DSTPORT   | CNT |
+|----------|------------|-----------------|-------|----------------------|------------|----------------|---------|-----------|-----|
+| TCP      | a0:d3:c1:aa:bb:cc | Apple, Inc. | 192.168.1.150 | EPH              | de:ad:be:ef:00:01 | UNKNOWN     | 104.20.15.1 | 443      | 112.0 |
+| TCP      | de:ad:be:ef:00:01 | UNKNOWN     | 104.20.15.1 | 443                | a0:d3:c1:aa:bb:cc | Apple, Inc. | 192.168.1.150 | EPH       | 98.0  |
+| TCP      | a0:d3:c1:aa:bb:cc | Apple, Inc. | 192.168.1.150 | EPH              | de:ad:be:ef:00:01 | UNKNOWN     | 104.20.15.1 | 80       | 3.0   |
+| TCP      | de:ad:be:ef:00:01 | UNKNOWN     | 104.20.15.1 | 80                | a0:d3:c1:aa:bb:cc | Apple, Inc. | 192.168.1.150 | EPH       | 1.0   |
+
+**Device Identification:**
+* **Source Device:** A device with MAC address "a0:d3:c1:aa:bb:cc" manufactured by Apple Inc., located at IP address "192.168.1.150". This could be a Mac computer, iPhone, iPad, or other Apple device.
+* **Destination Device:**  The destination device is unknown based on the provided data. The MAC address "de:ad:be:ef:00:01" is not recognized in our baseline and no manufacturer information is available.
+
+**Communication Details:**
+* **Protocols:** TCP (Transmission Control Protocol) is used for all connections. 
+* **Ports:** Both devices utilize ports commonly associated with web traffic:
+    * **443:**  Destination port 443 indicates an HTTPS connection, suggesting secure communication. This could be a website visit or application interaction.
+    * **80:** Destination port 80 indicates HTTP communication.  This is the standard protocol for unencrypted web browsing.
+
+**Traffic Volume:**
+
+* The connections exhibit relatively low traffic volume (112.0, 98.0, 3.0, and 1.0). This could indicate initial probing or small data exchanges.
+
+**Risk Assessment:**
+**Medium Risk.**
+
+
+**Rationale:**
+* **Unknown Device:**  The unidentified destination device with a non-standard MAC address raises suspicion. It could be a legitimate device that is not yet in our baseline, but it also could represent a malicious actor attempting to evade detection.
+* **HTTPS and HTTP:** The use of both HTTPS and HTTP protocols suggests typical web browsing or application usage. However, the unknown destination device makes it necessary to investigate further.
+
+**Recommendations:**
+
+
+* **Monitor:** Closely monitor this connection group for any unusual traffic patterns or changes in behavior. 
+* **Investigate Source Device:** Conduct a thorough investigation into the Apple device (a0:d3:c1:aa:bb:cc) to determine its legitimate usage and ensure it is not compromised.
+
+
+* **Consider Blocking:** If monitoring reveals suspicious activity or the source device cannot be authenticated, consider blocking communication with the unknown destination device until further investigation can be conducted.
+
+
+
+
+
+===== Connection Group 2 Analysis =====
+## Anomalous Connection Group Analysis
+
+**Anomaly ID:**  (Assign a unique ID to this connection group)
+
+**Timestamp:** (Capture the timestamp of the anomaly detection)
+
+
+**1. Device Identification:**
+
+* **Source Device:** Dell Inc device with MAC address f8:75:a4:dd:ee:ff, identified as a potential endpoint based on its IP address 192.168.1.55.
+* **Destination Device:**  Device with unknown manufacturer and MAC address aa:bb:cc:00:11:22, with IP address 192.168.1.20. This device is unidentified and raises concern due to the unknown MFG.
+
+**2. Communication Details:**
+
+* **Protocols:** UDP (User Datagram Protocol) used for both connections. UDP is a connectionless protocol often used for applications requiring low latency and minimal overhead, such as streaming or gaming. 
+* **IP Addresses:** The source device uses IP address 192.168.1.55 while the destination device uses 192.168.1.20. Both IPs are within a typical private network range.
+* **Ports:**
+    * **Source Ports (Ephemeral):** EPH indicates ephemeral ports dynamically assigned by the operating system, suggesting client-initiated connections.
+    * **Destination Ports:** 
+        * Connection 1:  54321 - Uncommon port number, not associated with standard services. Further investigation is required to determine its purpose.
+        * Connection 2: 12345 - Uncommon port number, similar to connection 1, requiring further analysis.
+
+**3. Traffic Volume:**
+
+* **CNT (Packet Counts):** Both connections show relatively low traffic volume (5.0 and 2.0 packets respectively).  While this doesn't necessarily indicate benign activity, it might suggest a probing or initial scan rather than sustained malicious activity.
+
+
+**4. Risk Assessment:**
+
+* **Medium Risk:** The combination of unknown devices, unusual ports, and UDP communication raises concerns. While the traffic volume is low, further investigation is crucial to understand the nature and purpose of these connections.
+
+
+**5. Recommendations:**
+
+* **Monitor:**  Closely monitor these connections for any changes in traffic patterns or escalation.
+* **Investigate:** Conduct a deeper analysis of the unknown device (aa:bb:cc:00:11:22) to identify its type, purpose, and potential vulnerabilities. 
+* **Network Segmentation:** Consider segmenting the network to isolate the affected devices and limit potential lateral movement.
+* **Alerting System Enhancements:** Review baseline detection rules and consider adding specific rules to detect similar anomalous connections in the future.
+
+
+**Additional Notes:**
+
+*  It is essential to review logs from the firewall, IDS/IPS systems, and the affected devices for additional context and insights.
+* Collaborate with other security teams, such as incident response or threat intelligence, to share information and coordinate responses. 
+
+
+
+
+
+===== Connection Group 3 Analysis =====
+## Anomalous Connection Group Analysis
+
+**Connection Data:**
+
+| PROTOCOL            | SRCMAC                                | SRCMFG        | SRCIP   | SRCPORT | DSTMAC     | DSTMFG       | DSTIP    | DSTPORT | CNT |
+|---------------------|----------------------------------------|-------------|---------|----------|------------|--------------|-----------|---------|------|
+| UDP                 | b8:27:eb:11:22:33                     | Raspberry Pi Foundation | 192.168.1.30  | 5353     | 01:00:5e:00:00:fb | MULTICAST    | 224.0.0.251 | 5353     | 15.0 |
+| UDP                 | c2:30:6b:44:55:66                     | Hangzhou H3C Technologies Co., Limited | 192.168.1.88  | 5353     | 01:00:5e:00:00:fb | MULTICAST    | 224.0.0.251 | 5353     | 8.0 |
+
+**Device Identification:**
+
+* **Source Device 1:** Raspberry Pi Foundation device with MAC address b8:27:eb:11:22:33, identified as a common consumer/hobbyist device.
+* **Source Device 2:** Hangzhou H3C Technologies Co., Limited device with MAC address c2:30:6b:44:55:66, potentially a network switch or router based on its manufacturer.
+
+**Communication Details:**
+
+* Both devices are using UDP protocol on port 5353 to communicate with a multicast address (224.0.0.251) on the same port.
+* Multicast addresses are used for broadcasting data to multiple devices simultaneously. This suggests a potential use case like a streaming service or internal communication within the network.
+
+**Traffic Volume:**
+
+* The traffic volume is relatively low, with 15 packets for Device 1 and 8 packets for Device 2.
+
+**Risk Assessment:**
+
+* **Medium Risk:**  The use of UDP and multicast addresses on non-standard port 5353 raises suspicion. While the ports themselves are not inherently malicious, their utilization outside typical communication patterns warrants further investigation.
+
+
+**Recommendations:**
+
+* **Monitor:** Continuously monitor this connection for any changes in traffic volume or destination address.
+* **Investigate:** Investigate the purpose of this multicast communication and identify the applications or services involved. 
+* **Whitelist (if legitimate):** If determined to be a legitimate internal communication, consider whitelisting these addresses and ports based on thorough analysis and understanding of their function within the network.
+
+
+**Note:** This analysis is based solely on the provided connection data. Further context, such as network topology, system logs, and user activity, could provide additional insights and influence the risk assessment and recommendations. 
+
+
+===== Connection Group 4 Analysis =====
+## Anomalous Connection Group Analysis
+
+**Anomalous Connection Group:** 
+
+* **PROTOCOL:** ARP (Address Resolution Protocol)
+    * **SRCMAC:** 00:15:17:77:88:99
+    * **SRCMFG:** Intel Corporate
+    * **SRCIP:** 192.168.1.1
+    * **SRCPORT:** NaN (Not Applicable to ARP)
+    * **DSTMAC:** 12:34:56:78:9a:bc
+    * **DSTMFG:** UNKNOWN
+    * **DSTIP:** 192.168.1.150
+    * **DSTPORT:** NaN (Not Applicable to ARP)
+    * **CNT:** 2.0
+
+**Device Identification:**
+
+* **Source Device:** Intel Corporate device with MAC address 00:15:17:77:88:99, located at IP address 192.168.1.1.
+* **Destination Device:** Unknown device with MAC address 12:34:56:78:9a:bc, located at IP address 192.168.1.150.
+
+**Communication Details:**
+
+* The connection utilizes the ARP protocol for discovering the MAC address associated with a given IP address. This is a standard network communication method.
+* The source device (Intel Corporate) attempted to resolve the IP address 192.168.1.150, likely for communication purposes. However, the destination device's manufacturer and type are unknown.
+
+**Traffic Volume:**
+
+* A relatively low traffic volume of 2 packets is observed between these devices.
+
+**Risk Assessment:**
+
+* **Medium Risk:**  The connection itself is benign as it utilizes the standard ARP protocol. The risk arises from the unknown device (DSTMFG). An unidentified device on the network could indicate a compromised system, unauthorized access, or simply a newly connected device that requires identification and configuration.
+
+
+**Recommendations:**
+
+* **Investigate:** Identify the unknown device with MAC address 12:34:56:78:9a:bc. Determine its manufacturer, purpose, and authorized user.
+* **Monitor:** Keep track of communication patterns from this device for any suspicious activity. 
+* **Baseline Update:** If the device is legitimate and authorized, update the network baseline with its manufacturer information.
+
+
+
+
+Let me know if you have any other connection data to analyze!
+
+===== Connection Group 5 Analysis =====
+## Anomalous Connection Group Analysis 
+
+**Connection Data:**
+
+| PROTOCOL            | SRCMAC          | SRCMFG         | SRCIP  | SRCPORT | DSTMAC          | DSTMFG         | DSTIP  | DSTPORT | CNT |
+|----------------------|------------------|---------------|---------|----------|------------------|---------------|--------|-----------|-----|
+| ICMP                | a0:d3:c1:aa:bb:cc | Apple, Inc.     | 192.168.1.150 | NaN   | 00:15:17:77:88:99 | Intel Corporate | 192.168.1.1 | NaN  | 4.0 |
+| ICMP                | 00:15:17:77:88:99 | Intel Corporate | 192.168.1.1 | NaN   | a0:d3:c1:aa:bb:cc | Apple, Inc.     | 192.168.1.150 | NaN  | 4.0 |
+
+**1. Device Identification:**
+
+* **Source Device (a0:d3:c1:aa:bb:cc):**  Apple device (identified by MAC address)
+* **Destination Device (00:15:17:77:88:99):** Intel device (identified by MAC address) 
+
+**2. Communication Details:**
+
+* **Protocol:** ICMP (Internet Control Message Protocol). Used for network diagnostics and error reporting.
+* **IP Addresses:**
+    * Source IP: 192.168.1.150
+    * Destination IP: 192.168.1.1
+* **Ports:**  No specific port information is available as ICMP doesn't utilize ports in the same way other protocols do. 
+
+**3. Traffic Volume:**
+
+* **CNT (Packet Count):** Both connections have a packet count of 4, suggesting brief communication.
+
+**4. Risk Assessment:**
+
+* **Risk Level:** Low
+* **Reasoning:**  ICMP traffic is typically benign and used for routine network management tasks. The low packet count further suggests non-malicious activity. While the use of ICMP from unknown devices should always be monitored, this connection doesn't display immediate red flags.
+
+**5. Recommendations:**
+
+
+* **Monitor:** Continue to monitor this communication pattern for any changes in volume, frequency, or content that could indicate malicious intent.
+* **Investigate further:** If similar connections with higher packet counts or unusual ICMP messages are observed, investigate the source and destination devices more thoroughly. 
+
+
+
+
+
+===== Connection Group 6 Analysis =====
+## Anomalous Connection Group Analysis
+
+**Connection Details:**
+
+* **Group:** TCP connections between a VMware virtual machine and an Arista network device
+* **Captured At:** Not specified in the provided data
+
+**Device Identification:**
+
+* **Source Device (SRCMAC):** 00:50:56:ab:cd:ef - Identified as a device manufactured by VMware Inc. 
+* **Destination Device (DSTMAC):** f0:09:0d:12:34:56 - Identified as an Arista Networks device.
+
+**Communication Details:**
+
+* **Protocol:** TCP - A standard protocol for reliable, ordered data transmission.
+* **Source IP Address (SRCIP):** 10.0.0.5
+* **Destination IP Address (DSTIP):** 10.0.0.10
+* **Source Port (SRCPORT):** EPH (Ephemeral port > 1024) - Used by clients to initiate connections.
+* **Destination Port (DSTPORT):** 9999 - Non-standard port, purpose unknown without further investigation.
+
+**Traffic Volume:**
+
+* **CNT (Packet Count):** 25.0 for the first connection, 18.0 for the second connection. This indicates relatively low traffic volume for these connections.
+
+**Risk Assessment:**
+
+* **Medium Risk** -  
+    * **Unknown Destination Port (9999):** This raises suspicion as it's not a commonly used port and its purpose is unclear. 
+    * **Ephemeral Ports Used:** While common, the use of ephemeral ports by both devices suggests a potential attempt to avoid detection or analysis.
+
+**Recommendations:**
+
+1. **Monitor:** Closely monitor these connections for any unusual patterns or changes in traffic volume.
+2. **Investigate Destination Port (9999):**  Attempt to identify the purpose of port 9999 on the Arista device. This could involve:
+    * Consulting network configuration files.
+    * Using network monitoring tools to capture and analyze packets on this port.
+    * Reviewing security logs for any related events.
+3. **Consider Blocking:** If the investigation reveals malicious activity or unauthorized access, consider blocking traffic to/from port 9999 on the Arista device.
+
+
+
+Let me know if you have any more connection data to analyze!

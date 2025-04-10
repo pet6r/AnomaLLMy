@@ -1,0 +1,265 @@
+
+===========================================================
+ANOMALY ANALYSIS RESULTS
+===========================================================
+Source File: anomalies_mock_connections.csv
+Model Used: dolphin-llama3:8b
+Analysis Date: 2025-04-09 17:14:13
+===========================================================
+
+
+ANALYSIS METRICS:
+===============================
+1. Performance Metrics:
+   - Total Elapsed Time: 64.95 seconds
+   - Average Response Rate: 20.84 words/second
+
+2. Content Metrics:
+   - Total Word Count: 1268
+   - Total Character Count: 8567
+   - Total Sentence Count: 145
+   - Average Word Length: 6.76 characters
+   - Average Sentence Length: 8.74 words
+   - Average Vocabulary Richness: 0.5496
+
+3. Content Analysis:
+   - Top 5 Most Common Words: 1 (33), source (25), connection (21), destination (20), address (14)
+===============================
+
+
+===== Connection Group 1 Analysis =====
+Anomalous Connection Group:
+
+1. Protocol: TCP
+   Source MAC Address (SRCMAC): a0: d3: c1: aa: bb: cc
+   Source Manufacturer (SRCMFG): Apple, Inc.
+   Source IP (SRCIP): 192.168.1.150
+   Source Port (SRCPORT): EPH
+
+   Destination MAC Address (DSTMAC): de: ad: be: ef: 00: 01
+   Destination Manufacturer (DSTMFG): UNKNOWN
+   Destination IP (DSTIP): 104.20.15.1
+   Destination Port (DSTPORT): 443
+
+   Packet Count (CNT): 112.0
+
+2. Protocol: TCP
+   Source MAC Address (SRCMAC): de: ad: be: ef: 00: 01
+   Source Manufacturer (SRCMFG): UNKNOWN
+   Source IP (SRCIP): 104.20.15.1
+   Source Port (SRCPORT): EPH
+
+   Destination MAC Address (DSTMAC): a0: d3: c1: aa: bb: cc
+   Destination Manufacturer (DSTMFG): Apple, Inc.
+   Destination IP (DSTIP): 192.168.1.150
+   Destination Port (DSTPORT): 443
+
+   Packet Count (CNT): 98.0
+
+3. Protocol: TCP
+   Source MAC Address (SRCMAC): a0: d3: c1: aa: bb: cc
+   Source Manufacturer (SRCMFG): Apple, Inc.
+   Source IP (SRCIP): 192.168.1.150
+   Source Port (SRCPORT): EPH
+
+   Destination MAC Address (DSTMAC): de: ad: be: ef: 00: 01
+   Destination Manufacturer (DSTMFG): UNKNOWN
+   Destination IP (DSTIP): 104.20.15.1
+   Destination Port (DSTPORT): 80
+
+   Packet Count (CNT): 3.0
+
+4. Protocol: TCP
+   Source MAC Address (SRCMAC): de: ad: be: ef: 00: 01
+   Source Manufacturer (SRCMFG): UNKNOWN
+   Source IP (SRCIP): 104.20.15.1
+   Source Port (SRCPORT): EPH
+
+   Destination MAC Address (DSTMAC): a0: d3: c1: aa: bb: cc
+   Destination Manufacturer (DSTMFG): Apple, Inc.
+   Destination IP (DSTIP): 192.168.1.150
+   Destination Port (DSTPORT): 80
+
+   Packet Count (CNT): 1.0
+
+Risk Assessment:
+
+The risk level for these anomalous connections is Medium.
+
+Explanation:
+These connections involve traffic between an Apple device and an unknown device over TCP protocol. The fact that the devices are unknown adds a layer of uncertainty, which increases the risk level. However, there is no indication of malicious activity, so it doesn't warrant a High or Critical risk assessment. Further investigation is needed to understand the nature of these connections.
+
+Recommendations:
+1. Investigate: Conduct further analysis and research on the UNKNOWN device(s) involved in these connections.
+2. Monitor: Keep an eye on these connections for any suspicious activities or changes in traffic patterns.
+3. Allow: Since there's no indication of malicious intent, allow these connections to continue for now, but keep a close watch.
+
+===== Connection Group 2 Analysis =====
+Anomalous Connection Group:
+
+1. Device Identification:
+   a. First connection:
+      - Device 1: MAC address - f8:75:a4:dd:ee:ff, Manufacturer - Dell Inc
+      - Device 2: MAC address - aa:bb:cc:00:11:22, Manufacturer - UNKNOWN
+
+   b. Second connection:
+      - Device 1: MAC address - aa:bb:cc:00:11:22, Manufacturer - UNKNOWN
+      - Device 2: MAC address - f8:75:a4:dd:ee:ff, Manufacturer - Dell Inc
+
+2. Communication Details:
+   a. First connection:
+      - Protocol: UDP
+      - Source IP (SRCIP): 192.168.1.55
+      - Source Port (SRCPORT): EPH (Ephemeral)
+      - Destination IP (DSTIP): 192.168.1.20
+      - Destination Port (DSTPORT): UNKNOWN
+
+   b. Second connection:
+      - Protocol: UDP
+      - Source IP (SRCIP): 192.168.1.20
+      - Source Port (SRCPORT): EPH (Ephemeral)
+      - Destination IP (DSTIP): 192.168.1.55
+      - Destination Port (DSTPORT): UNKNOWN
+
+3. Traffic Volume:
+   a. First connection: Packet count (CNT) = 5.0
+   b. Second connection: Packet count (CNT) = 2.0
+
+4. Risk Assessment:
+   - The risk level for these connections is Medium.
+     Reasoning: There are unknown devices involved, and the communication pattern does not match our baseline.
+
+5. Recommendations:
+   - Investigate the purpose of the unknown destination port and determine if it poses a threat to our network environment.
+
+
+===== Connection Group 3 Analysis =====
+**Device Identification:**
+
+- Device 1:
+  - Manufacturer (MFG): Raspberry Pi Foundation
+  - MAC Address: b8:27:eb:11:22:33
+
+- Device 2:
+  - Manufacturer (MFG): Hangzhou H3C Technologies Co., Limited
+  - MAC Address: c2:30:6b:44:55:66
+
+**Communication Details:**
+
+- Connection 1 (UDP):
+  - Protocol: UDP
+  - Source IP (SRCIP): 192.168.1.30
+  - Source Port (SRCPORT): 5353
+  - Destination IP (DSTIP): 224.0.0.251
+  - Destination Port (DSTPORT): 5353
+
+- Connection 2 (UDP):
+  - Protocol: UDP
+  - Source IP (SRCIP): 192.168.1.88
+  - Source Port (SRCPORT): 5353
+  - Destination IP (DSTIP): 224.0.0.251
+  - Destination Port (DSTPORT): 5353
+
+**Traffic Volume:**
+
+- Connection 1:
+  - Packet Count (CNT): 15
+
+- Connection 2:
+  - Packet Count (CNT): 8
+
+**Risk Assessment:**
+
+- Risk Level for Connection 1: Medium
+  - Reasoning: The connection involves an unknown device (Raspberry Pi Foundation) and uses a protocol not in the allowed baseline. However, it does not indicate any malicious activity.
+
+- Risk Level for Connection 2: Low
+  - Reasoning: The connection involves another unknown device (Hangzhou H3C Technologies Co., Limited) and also uses a protocol not in the allowed baseline. But the packet count is relatively low, suggesting less significant activity.
+
+**Recommendations:**
+
+- For Connection 1:
+  - Action: Monitor
+  - Reason: While the risk level is medium, there doesn't seem to be any immediate threat. Monitoring this connection will help determine if it becomes more suspicious or requires further action.
+
+- For Connection 2:
+  - Action: Allow
+  - Reason: Since the risk level is low and there's no indication of malicious activity, allowing this connection might not pose a significant security risk.
+
+===== Connection Group 4 Analysis =====
+Anomalous Connection Group:
+
+Device Identification:
+- Source MAC Address: 00:15:17:77:88:99, Manufacturer (MFG): Intel Corporate
+- Destination MAC Address: 12:34:56:78:9a:bc, Manufacturer (MFG): UNKNOWN
+
+Communication Details:
+- Protocol: ARP
+- Source IP Address: 192.168.1.1
+- Source Port: NaN
+- Destination IP Address: 192.168.1.150
+- Destination Port: NaN
+
+Traffic Volume:
+- Packet Count (CNT): 2.0 (total packets sent from the source to the destination)
+
+Risk Assessment:
+Assessing the risk level for this connection group is challenging due to limited data. ARP is generally a low-risk protocol, but communication with an unknown manufacturer raises suspicion. Without additional information about the purpose of these connections or the nature of the traffic, it's difficult to determine the exact risk level.
+
+Recommendations:
+1. Investigate: Conduct further analysis and gather more information about the unknown device and its communication patterns.
+2. Monitor: Keep an eye on this connection group for any unusual activity in the future.
+3. Allow: If there are no concerns regarding the unknown device or protocol, consider allowing these connections to continue with additional monitoring.
+
+===== Connection Group 5 Analysis =====
+Anomalous Connection Group:
+
+1. Device Identification:
+- Apple, Inc.: MAC address `a0:d3:c1:aa:bb:cc`
+- Intel Corporation: MAC address `00:15:17:77:88:99`
+
+2. Communication Details:
+- Protocol: ICMP
+- IP addresses: Source (`192.168.1.150`), Destination (`192.168.1.1`)
+- Ports: Source (`NaN`), Destination (`NaN`)
+- Purpose: Not specified
+
+3. Traffic Volume: 4 packets
+
+4. Risk Assessment:
+- Low risk level
+
+5. Recommendations: Allow the connection, as it is likely a routine ICMP echo request/response exchange between devices on the network.
+
+Format your response using clear headings and bullet points for readability.
+
+===== Connection Group 6 Analysis =====
+Anomalous Connection Group:
+PROTOCOL            SRCMAC              SRCMFG     SRCIP SRCPORT            DSTMAC              DSTMFG     DSTIP DSTPORT  CNT
+     TCP 00:50:56:ab:cd:ef          VMware Inc  10.0.0.5     EPH f0:09:0d:12:34:56 Arista Networks Inc 10.0.0.10    9999 25.0
+
+Device Identification:
+- Device 1 (SRCMAC: 00:50:56:ab:cd:ef) is manufactured by VMware Inc.
+- Device 2 (DSTMAC: f0:09:0d:12:34:56) is manufactured by Arista Networks Inc.
+
+Communication Details:
+- Protocol: TCP
+- Source MAC Address: 00:50:56:ab:cd:ef
+- Source Manufacturer: VMware Inc
+- Source IP Address: 10.0.0.5
+- Source Port: EPH (Ephemeral Port)
+- Destination MAC Address: f0:09:0d:12:34:56
+- Destination Manufacturer: Arista Networks Inc
+- Destination IP Address: 10.0.0.10
+- Destination Port: 9999
+
+Traffic Volume:
+- Packet Count (CNT): 25.0
+
+Risk Assessment:
+- Risk Level: Medium
+- Reasoning: The connection involves an unknown device (VMware Inc) and uses a non-standard port (EPH). This could indicate potential unauthorized access or suspicious activity.
+
+Recommendations:
+- Investigate the source and destination IP addresses to determine if they are associated with known threats or malicious activities.
+- Monitor the connection for any further anomalous behavior.
