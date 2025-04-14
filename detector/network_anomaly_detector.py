@@ -180,13 +180,16 @@ def load_baseline(baseline_file, expected_key):
 
 def get_packet_protocol(packet: Packet) -> str | None:
     """Tries to determine the primary protocol name from a Scapy packet."""
+
     # Order matters: Check more specific layers first
     if TCP in packet: return "TCP"
     if UDP in packet: return "UDP"
+
     # Check ICMP variations after TCP/UDP
     if ICMP in packet and IPv6 in packet: return "IPV6-ICMP" # Check if ICMP is carried by IPv6
     if ICMP in packet: return "ICMP" # Assume IPv4 if not IPv6
     if ARP in packet: return "ARP"
+
     # Less common protocols / Layer 2/3 identification
     if IPv6 in packet: return packet[IPv6].sprintf("%IPv6.nh%").upper() # Next header field
     if IP in packet: return packet[IP].sprintf("%IP.proto%").upper() # Protocol field
@@ -194,16 +197,19 @@ def get_packet_protocol(packet: Packet) -> str | None:
         etype = packet[Ether].type
         if etype == 0x86DD: return "IPV6" # EtherType for IPv6
         if etype == 0x88CC: return "LLDP"
+
         # Add others if needed, e.g., 0x88A8 (Provider Bridging), 0x8100 (VLAN)
         return f"ETH-{hex(etype)}" # Generic EtherType
     return None # Cannot determine protocol
 
 def format_port(port, protocol):
     """Format port numbers for the CSV output, handling ephemeral ports."""
+
     if not port or protocol not in ["TCP", "UDP"]: # Only format ports for TCP/UDP
         return ""
     try:
         port_num = int(port)
+
         # Use IANA suggested ephemeral range (adjust if needed)
         if port_num > 49151:
             return "EPH"
@@ -552,7 +558,6 @@ def main():
             # Add a tiny sleep to prevent high CPU usage in case sniff returns immediately
             # time.sleep(0.01)
 
-
     except PermissionError:
         print(f"\n[!] Permission Error: Failed to capture on {args.iface}.", file=sys.stderr)
         print( "   Please run the script with sufficient privileges (e.g., using 'sudo').")
@@ -592,7 +597,7 @@ if __name__ == "__main__":
                  print("Warning: Could not determine privilege level. Live capture might require root/admin rights.", file=sys.stderr)
         except Exception as e: # Catch other potential errors during check
              print(f"Warning: Could not check privilege level ({e}). Live capture might require root/admin rights.", file=sys.stderr)
-             # Import ctypes only needed for Windows check, place import inside try block if desired
+             # Import ctypes only needed for Windows check
              import ctypes
 
 
