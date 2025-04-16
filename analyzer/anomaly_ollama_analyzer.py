@@ -1,3 +1,5 @@
+# anomaly_ollama_analyzer.py
+
 import pandas as pd
 import ollama
 import os
@@ -346,3 +348,44 @@ if __name__ == "__main__":
         logging.info("Setting mode to 'file' since a specific file was provided")
 
     analyzer.run_analysis(mode=args.mode)
+# --- How To Run ---
+#
+# 1. Prerequisites:
+#
+#    - Make sure Ollama is running and the desired model (e.g., dolphin-llama3:8b) is pulled:
+#      ollama pull dolphin-llama3:8b
+#
+#    - Have network anomaly CSV files (anomalies_*.csv) available. By default,
+#      this script looks for them in '../detector/anomaly_logs'.
+#
+# 2. Running the Analysis:
+#    - The script generates text analysis files (.txt) and saves them by default
+#      into a folder named 'analysis_results'.
+#
+#    - It keeps track of analyzed files in 'analysis_results/analyzed_files.txt'
+#      to avoid re-analyzing unless explicitly told to analyze a specific file.
+#
+#    # Basic usage (analyzes the LATEST unanalyzed anomaly CSV using the default model):
+#    python3 anomaly_analyzer.py
+#
+#    # Analyze ALL unanalyzed anomaly CSV files:
+#    python3 anomaly_analyzer.py --mode all
+#
+#    # Analyze a SPECIFIC anomaly CSV file (will analyze even if previously analyzed):
+#    python3 anomaly_analyzer.py -f anomalies_20231101_103000.csv
+#    # OR (if the file is somewhere else, provide the full path):
+#    python3 anomaly_analyzer.py -f /path/to/your/anomalies_20231101_103000.csv
+#
+# 3. Customizing the Analysis:
+#    # Use a different Ollama model (make sure it's pulled):
+#    python3 anomaly_analyzer.py -m mistral:latest
+#
+#    # Specify where the anomaly CSV files ARE:
+#    python3 anomaly_analyzer.py -d /path/to/your/anomaly/csv_folder/
+#
+#    # Specify where to SAVE the generated analysis (.txt) files:
+#    python3 anomaly_analyzer.py -o /path/to/your/analysis/output_folder/
+#
+#    # Combine options (use a specific model, analyze all files from a custom input dir, save to custom output dir):
+#    python3 anomaly_analyzer.py -m llama3:70b -d /input/csvs -o /output/reports
+#
