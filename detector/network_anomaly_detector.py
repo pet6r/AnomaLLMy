@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
+#   |
+#   Used for automation
+#
 # network_anomaly_detector.py
+
 import pickle
 import argparse
 import sys
@@ -54,7 +58,7 @@ def normalize_mac_to_oui(mac_address):
             return oui_part
     return None
 
-# <<< MODIFIED get_manufacturer >>>
+# <<< get_manufacturer >>>
 def get_manufacturer(mac_address):
     """
     Gets the manufacturer name for a MAC address using the
@@ -114,7 +118,7 @@ def get_connection_key(packet, protocol):
     key = f"{protocol}|{src_mac or 'N/A'}|{src_ip or 'N/A'}|{src_port or 'N/A'}|{dst_mac or 'N/A'}|{dst_ip or 'N/A'}|{dst_port or 'N/A'}"
     return key
 
-# <<< REVISED load_baseline >>>
+# <<< load_baseline >>>
 def load_baseline(baseline_file, expected_key):
     """
     Loads data from a WHITELIST baseline pickle file (OUI or Protocol)
@@ -187,15 +191,15 @@ def get_packet_protocol(packet: Packet) -> str | None:
 
     # Check ICMP variations after TCP/UDP
     if ICMP in packet and IPv6 in packet: return "IPV6-ICMP" # Check if ICMP is carried by IPv6
-    if ICMP in packet: return "ICMP" # Assume IPv4 if not IPv6
+    if ICMP in packet: return "ICMP"                         # Assume IPv4 if not IPv6
     if ARP in packet: return "ARP"
 
     # Less common protocols / Layer 2/3 identification
     if IPv6 in packet: return packet[IPv6].sprintf("%IPv6.nh%").upper() # Next header field
-    if IP in packet: return packet[IP].sprintf("%IP.proto%").upper() # Protocol field
-    if Ether in packet: # Identify some common EtherTypes if no IP layer found
+    if IP in packet: return packet[IP].sprintf("%IP.proto%").upper()    # Protocol field
+    if Ether in packet:                                                 # Identify some common EtherTypes if no IP layer found
         etype = packet[Ether].type
-        if etype == 0x86DD: return "IPV6" # EtherType for IPv6
+        if etype == 0x86DD: return "IPV6"                               # EtherType for IPv6
         if etype == 0x88CC: return "LLDP"
 
         # Add others if needed, e.g., 0x88A8 (Provider Bridging), 0x8100 (VLAN)
@@ -602,28 +606,48 @@ if __name__ == "__main__":
 
 
     main()
-    # --- How to run ---
-    # 1. Make sure baseline files are created:
-    #    cd ../baseline
-    #    python create_oui_baseline.py
-    #    python create_protocol_baseline.py
-    #
-    # 2. Run the network anomaly detector (will need admin privileges):
-    #
-    #    # On Linux:
-    #    sudo python3 network_anomaly_detector.py -i eth0
-    #
-    #    # On macOS:
-    #    sudo python network_anomaly_detector.py -i en0
-    #
-    #    # On Windows (run cmd as administrator):
-    #    python network_anomaly_detector.py -i Ethernet
-    #
-    # 3. To change the export interval (e.g., to 5 minutes):
-    #    sudo python3 network_anomaly_detector.py -i en0 -t 5
-    #
-    # 4. To specify a different output directory:
-    #    sudo python3 network_anomaly_detector.py -i en0 -o /path/to/log/directory
-    #
-    # 5. To use a custom packet filter (advanced users):
-    #    sudo python3 network_anomaly_detector.py -i en0 -f "ip or ip6"
+
+# --- How To Run ---
+#
+#
+# 1. IMPORTANT: Make sure baseline files exist first!
+#    - Navigate to the baseline script directory:
+#      cd path/to/your/project/baseline
+#
+#    - Run the scripts to generate the .pkl files:
+#      python create_oui_baseline.py        # Creates oui_baseline.pkl
+#      python create_protocol_baseline.py   # Creates protocol_baseline.pkl
+#      python create_comprehensive_oui.py   # Creates oui_comprehensive.pkl
+#
+#    - Come back to the directory containing this detector script.
+#      cd ../detector
+#
+# 2. Run the Network Anomaly Detector:
+#    (You will need administrator/root privileges)
+#
+#    # Example for Linux (replace eth0 if needed):
+#    sudo python3 network_anomaly_detector.py -i eth0
+#
+#    # Example for macOS (replace en0 if needed):
+#    sudo python3 network_anomaly_detector.py -i en0
+#
+#    # Example for Windows (run Command Prompt or PowerShell as Administrator):
+#    # (replace 'Ethernet' with your actual interface name, e.g., 'Wi-Fi')
+#    python3 network_anomaly_detector.py -i Ethernet
+#
+# 3. Example: Change export interval to 5 minutes:
+#    sudo python3 network_anomaly_detector.py -i eth0 -t 5
+#
+# 4. Example: Save reports to a different folder:
+#    sudo python3 network_anomaly_detector.py -i eth0 -o /var/log/anomalies
+#
+# 5. Example: Use a custom packet filter (advanced):
+#    # Capture only IP traffic (v4 or v6)
+#    sudo python3 network_anomaly_detector.py -i eth0 -f "ip or ip6"
+#
+#    # Capture only traffic to/from a specific IP address
+#    sudo python3 network_anomaly_detector.py -i eth0 -f "host 192.168.1.100"
+#
+#    # Capture only web traffic (ports 80 or 443)
+#    sudo python3 network_anomaly_detector.py -i eth0 -f "tcp port 80 or tcp port 443"
+#

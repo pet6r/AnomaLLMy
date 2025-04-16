@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # create_comprehensive_oui.py - Parses a Wireshark-style 'manuf' file
-#                             to create a comprehensive OUI->MFG pickle lookup file.
+# to create a comprehensive OUI->MFG pickle lookup file.
 
 import pickle
 import argparse
@@ -159,7 +159,9 @@ if __name__ == "__main__":
 
 # --- How to run ---
 # 1. Save this code as a Python file (e.g., create_comprehensive_oui.py).
+#
 # 2. Download the 'manuf' file (e.g., from Wireshark's site).
+#
 # 3. Run the script, providing the path to your 'manuf' file:
-#    python create_comprehensive_oui.py -i /path/to/your/downloaded/manuf -o ../baseline/pickle_files/oui_comprehensive.pkl
+#    python3 create_comprehensive_oui.py -i /path/to/your/downloaded/manuf -o ../baseline/pickle_files/oui_comprehensive.pkl
 #    (Adjust the output path -o if needed)

@@ -1,3 +1,5 @@
+# create_docx_report.py
+
 import re
 from docx import Document
 from datetime import datetime
@@ -256,3 +258,47 @@ if __name__ == "__main__":
             logging.info("-" * (len(os.path.basename(input_file_path)) + 18)) # Separator
 
     logging.info(f"DOCX report generation process finished. {processed_count} reports generated.")
+
+
+
+# --- How To Run ---
+#
+# Purpose: This script converts analysis reports (plain text .txt files) into
+#          formatted Microsoft Word documents (.docx).
+#
+# 1. Prerequisites:
+#    - Ensure Python 3 is installed.
+#    - Install the required library:
+#      pip install python-docx
+#    - Have analysis result files (*_analysis_*.txt) ready. By default,
+#      this script looks for them in a folder named 'analysis_results'
+#      in the same directory as the script.
+#
+# 2. Running the Script:
+#    - The script generates .docx files and saves them by default into
+#      a folder named 'docx_reports'.
+#
+#    # Basic usage (processes the LATEST analysis file in 'analysis_results/'):
+#    python create_docx_report.py
+#
+#    # Process ALL analysis files in 'analysis_results/':
+#    python create_docx_report.py --mode all
+#
+#    # Process a SPECIFIC analysis file (located in 'analysis_results/'):
+#    python create_docx_report.py -f your_analysis_file.txt
+#    # OR (if the file is somewhere else, provide the full path):
+#    python create_docx_report.py -f /path/to/your/your_analysis_file.txt
+#
+# 3. Using Custom Folders:
+#    # Specify where the analysis files ARE:
+#    python create_docx_report.py -i /path/to/your/analysis_files/
+#
+#    # Specify where to SAVE the generated .docx files:
+#    python create_docx_report.py -o /path/to/your/output_folder/
+#
+#    # Combine custom folders (process LATEST file from input dir):
+#    python create_docx_report.py -i /input/folder/path -o /output/folder/path
+#
+#    # Combine custom folders AND process ALL files:
+#    python create_docx_report.py --mode all -i /input/folder/path -o /output/folder/path
+#

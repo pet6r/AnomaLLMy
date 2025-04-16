@@ -69,4 +69,4 @@ if __name__ == "__main__":
 # --- How to run ---
 # 1. Edit the ALLOWED_PROTOCOLS set in this script.
 # 2. Run the script:
-#    python create_protocol_baseline.py -o pickle_files/my_protocol_rules.pkl
+#    python3 create_protocol_baseline.py

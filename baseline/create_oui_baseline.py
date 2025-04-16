@@ -106,4 +106,4 @@ if __name__ == "__main__":
 # --- How to run ---
 # 1. Edit the KNOWN_OUI_MFG_DATA dictionary in this script with your known devices.
 # 2. Run the script:
-#    python create_oui_baseline.py -o pickle_files/my_device_baseline.pkl
+#    python3 create_oui_baseline.py
